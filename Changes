@@ -2,6 +2,14 @@ Summary of Changes to Tk::TableMatrix
 
 See ChangeLog for detailed changes.
 
+Release 1.2   1/26/05
+
+* Fixed bug which was causing crashes on perl 5.8.4 on win32 when 
+  anything was copied into the clipboard (i.e. when control-c pressed).
+  
+* Fixed row/col insert/deletes to work more reliably in TableMatrix::Spreadsheet
+
+
 Release 1.1:   2/12/04
 
 * Updated to be compatible with the new Tk804 series.

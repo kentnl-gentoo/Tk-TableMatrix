@@ -27,13 +27,16 @@ BEGIN
 
   };
 
+use constant HAVE_DISPLAY => $^O =~ /Win/ || defined $ENV{DISPLAY};
+use constant SKIP => HAVE_DISPLAY ? 0 : 'Skip if no display';
+
 eval { require Tk; };
 ok($@, "", "loading Tk module");
 
 my $mw;
 eval {$mw = Tk::MainWindow->new();};
-ok($@, "", "can't create MainWindow");
-ok(Tk::Exists($mw), 1, "MainWindow creation failed");
+skip(SKIP, $@, "", "can't create MainWindow");
+skip(SKIP, Tk::Exists($mw), 1, "MainWindow creation failed");
 eval { $mw->geometry('+10+10'); };  # This works for mwm and interactivePlacement
 
 my $w;
@@ -49,8 +52,8 @@ foreach my $class (@class)
     my $classCall = $class; # name of class, as it is called
     $classCall =~ s/.+?\:\://; 
     eval { $w = $mw->$classCall(); };
-    ok($@, "", "can't create $class widget");
-    skip($@, Tk::Exists($w), 1, "$class instance does not exist");
+    skip(SKIP, $@, "", "can't create $class widget");
+    skip(SKIP || $@, Tk::Exists($w), 1, "$class instance does not exist");
 
 
     if (Tk::Exists($w))
@@ -112,7 +115,7 @@ foreach my $class (@class)
       {
         # Widget $class couldn't be created:
 	#	Popup/pack, update, destroy skipped
-	for (1..5) { skip (1,1,1, "skipped because widget could not be created"); }
+	for (1..9) { skip (1,1,1, "skipped because widget could not be created"); }
       }
   }
 

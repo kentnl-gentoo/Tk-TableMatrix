@@ -4,6 +4,9 @@
 #include <perl.h>
 #include <XSUB.h>
 
+#undef MAX
+#undef MIN
+
 #include "tkGlue.def"
 
 #include "pTk/tkPort.h"

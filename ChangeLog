@@ -1,3 +1,40 @@
+2005-01-26 16:29  tag TableMatrix_1_2
+
+2005-01-26 16:29  cerney
+
+	* TableMatrix.pm: Preparation for next release.
+
+2005-01-26 12:12  cerney
+
+	* Changes, Makefile.PL, TableMatrix/Spreadsheet.pm,
+	TableMatrix/SpreadsheetHideRows.pm, pTk/Makefile.PL: Preparation
+	for next release.
+
+2005-01-26 09:27  A0182636
+
+	* pTk/mTk/: Tktable/tkTable.c, Tktable800/tkTable.c: Updated to
+	remove extraneous? Tcl_free that was causing crashes on win32 with
+	perl5.8.4. This Tcl_Free is not used like this to free args to
+	Tcl_ListObjGetElement anywhere else I can find examples in the
+	TableMatrix and Tk source code, so it appears to be truly not
+	needed.
+
+2004-06-14 08:26  cerney
+
+	* t/create.t: Incorporate Patch from Ed Avis to skip some tests if
+	there is no DISPLAY environment set. This helps with automated
+	build/tests on systems with no display.
+
+2004-04-23 08:40  cerney
+
+	* TableMatrix/Spreadsheet.pm: Fixed the row/col insert/deletes to
+	work more reliably.
+
+2004-04-06 11:41  cerney
+
+	* TableMatrix.xs: Patch from Nick Ing-Simmons to correct max/min
+	macro redefine warning messages when compiling.
+
 2004-02-23 07:43  tag TableMatrix_1_1
 
 2004-02-23 07:43  cerney

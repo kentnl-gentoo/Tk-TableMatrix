@@ -19,7 +19,7 @@
  * See the file "license.txt" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkTable.c,v 1.31 2004/02/08 03:09:45 cerney Exp $
+ * RCS: @(#) $Id: tkTable.c,v 1.32 2005/01/26 15:27:59 A0182636 Exp $
  */
 
 #include "tkTable.h"
@@ -3548,7 +3548,6 @@ TableFetchSelection(clientData, offset, buffer, maxBytes)
 		Tcl_DStringEndSublist(&selection);
 	    }
 	    */
-	    Tcl_Free((char *) listArgv);
 
 	    if (tablePtr->selCmd != NULL) {
         	if ( LangDoCallback(interp, tablePtr->selCmd, 1, 4, "%d %d %s %d",

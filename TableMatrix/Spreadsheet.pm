@@ -90,7 +90,7 @@ use Tk::Derived;
 
 use base qw/ Tk::Derived Tk::TableMatrix/;
 
-$VERSION = '1.1';
+$VERSION = '1.2';
 
 
 Tk::Widget->Construct("Spreadsheet");
@@ -275,6 +275,10 @@ sub Populate {
 		my ($x,$y) = ($Ev->x, $Ev->y);	
 			
 		my $pointerLoc = $cw->index('@'."$x,$y");
+		$cw->{pointerLoc} = $pointerLoc; # Save pointer location for the insert/delete row routines
+					         # After the local menu pops up and a item is selected, the pointer
+						 #  location won't be valid anymore
+		
 		# print "Pointer over = '$pointerLoc'\n";
 		
 		if( $cw->tagIncludes('title',$pointerLoc) && $pointerLoc ne '0,0' ){
@@ -306,12 +310,10 @@ sub Populate {
 sub insertRowCol{
 
 	my $cw = shift;
-	my $Ev = $cw->XEvent;
 
-	my ($x,$y) = ($Ev->x, $Ev->y);	
-
-	my $pointerLoc = $cw->index('@'."$x,$y");
+	my $pointerLoc = $cw->{pointerLoc}; # use the pointer locatin from before the popup window came up
 	my ($r,$c) = split(",",$pointerLoc);
+	#print "pointerLoc = $r, $c\n";
 	
 	if( $r <= 0){ # Insert Col
 		my %cols;
@@ -349,12 +351,10 @@ sub insertRowCol{
 sub deleteRowCol{
 
 	my $cw = shift;
-	my $Ev = $cw->XEvent;
 
-	my ($x,$y) = ($Ev->x, $Ev->y);	
-
-	my $pointerLoc = $cw->index('@'."$x,$y");
+	my $pointerLoc = $cw->{pointerLoc}; # use the pointer locatin from before the popup window came up
 	my ($r,$c) = split(",",$pointerLoc);
+	#print "pointerLoc = $r, $c\n";
 	
 	if( $r <= 0){ # Delete Col
 		my %cols;

@@ -27,7 +27,7 @@ $ptkPath =~ s/\/Lang.h$//g;
 
 Tk::MMutil::TkExtMakefile(
     'NAME'	=> 'Tk::pTk',
-    'VERSION'	=> '1.1',
+    'VERSION'	=> '1.2',
     'XS_VERSION'=> '0.9',
     'LINKTYPE'	=> 'static',
     'OBJECT'	=> '$(O_FILES)', 
