@@ -90,7 +90,7 @@ use Tk::Derived;
 
 use base qw/ Tk::Derived Tk::TableMatrix/;
 
-$VERSION = '1.0';
+$VERSION = '1.01';
 
 
 Tk::Widget->Construct("Spreadsheet");

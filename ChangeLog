@@ -1,3 +1,15 @@
+2002-12-06 08:08  cerney
+
+	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
+	TableMatrix/SpreadsheetHideRows.pm, pTk/Makefile.PL: Prep for next
+	release.
+
+2002-12-03 13:48  cerney
+
+	* pTk/mTk/Tktable/tkTable.c: Fixed Error where the rowHeight method
+	was getting executed like a colWidth. This was introduced in the
+	update of TkTable 2.5 to 2.6
+
 2002-12-02 09:44  cerney
 
 	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,

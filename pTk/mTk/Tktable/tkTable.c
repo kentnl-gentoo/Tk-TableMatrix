@@ -19,7 +19,7 @@
  * See the file "license.txt" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkTable.c,v 1.29 2002/11/15 21:19:42 cerney Exp $
+ * RCS: @(#) $Id: tkTable.c,v 1.30 2002/12/03 19:48:41 cerney Exp $
  */
 
 #include "tkTable.h"
@@ -710,6 +710,8 @@ TableWidgetObjCmd(clientData, interp, objc, objv)
 	    break;
 
 	case CMD_HEIGHT:
+	    result = Table_AdjustCmd(clientData, interp, objc, objv,0);
+	    break;
 	case CMD_WIDTH:
 	    result = Table_AdjustCmd(clientData, interp, objc, objv,1);
 	    break;
