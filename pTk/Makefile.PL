@@ -234,12 +234,10 @@ sub MY::postamble {
 my $self = shift;
 my $dep = $self->Tk::MMutil::mTk_postamble;
 
-$dep .= $self->dir_target(@{$self->{'dir_targets'}}); 
-
-$dep .= "config :: " . join(" \\\n\t",map($self->catfile($_,".exists"),@{$self->{'dir_targets'}})) .
-        "\n\t".$self->{NOECHO}."\$(NOOP)\n";
-
-
+if ($Tk::MMutil::IsWin32 or ($win_arch eq 'MSWin32' and $^O eq 'cygwin'))
+ {
+  my $cc = $Config{'cc'};
+  }
 $dep . '
 
 	'.$self->{NOECHO}.'$(NOOP)
