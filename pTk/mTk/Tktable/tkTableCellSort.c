@@ -18,7 +18,7 @@
  * Copyright (c) 1998-1999 by Scriptics Corporation.
 
  *
- * Copyright (c) 1998-1999 Jeffrey Hobbs
+ * Copyright (c) 1998-2002 Jeffrey Hobbs
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.

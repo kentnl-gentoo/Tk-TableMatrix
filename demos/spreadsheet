@@ -13,6 +13,7 @@ use Tk::TableMatrix;
 
 my ($rows,$cols) = (10,10); # number of rows/cols
 my $page = 'AA';
+my $oldPage = '';
 
 my $tableColors = { default => 'pink',AA => 'orange', BB => 'blue', CC => 'green'};
 
@@ -46,6 +47,22 @@ sub fill{
 	}
 }
 
+my $arrayVar = { AA => {},
+		 BB => {},
+		 CC => {}};
+
+fill('AA',$arrayVar->{AA}, $rows,$cols); # fill up the array variable
+fill('BB',$arrayVar->{BB}, $rows/2,$cols/2); # fill up the array variable
+
+my $t = $top->Scrolled('TableMatrix', -rows => $rows, -cols => $cols, 
+                              -width => 5, -height => 5,
+			      -titlerows => 1, -titlecols => 1,
+			      -coltagcommand => \&colorize,
+			      -selectmode => 'extended',
+			      -flashmode => 'on',
+			      -variable => $arrayVar->{$page},		      				
+
+                    );
 
 
 my $label = $top->Label(-text => "TableMatrix vs Spreadsheet Example");
@@ -63,24 +80,8 @@ my $pageSelect = $top->Optionmenu( -options => [ qw/ AA BB CC/],
 		-variable => \$page,
 		-command => [ \&changepage]);
 
-my $arrayVar = { AA => {},
-		 BB => {},
-		 CC => {}};
-
-fill('AA',$arrayVar->{AA}, $rows,$cols); # fill up the array variable
-fill('BB',$arrayVar->{BB}, $rows/2,$cols/2); # fill up the array variable
 
 
-my $t = $top->Scrolled('TableMatrix', -rows => $rows, -cols => $cols, 
-                              -width => 5, -height => 5,
-			      -titlerows => 1, -titlecols => 1,
-			      -coltagcommand => \&colorize,
-			      -selectmode => 'extended',
-			      -flashmode => 'on',
-			      -variable => $arrayVar->{$page},		      				
-
-                    );
-my $oldPage = '';
 sub changepage{
 
 	my ($newPage) = @_;

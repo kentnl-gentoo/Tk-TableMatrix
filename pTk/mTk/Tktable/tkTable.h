@@ -4,18 +4,17 @@
  *	This is the header file for the module that implements
  *	table widgets for the Tk toolkit.
  *
- * Copyright (c) 1997-2000 Jeffrey Hobbs
+ * Copyright (c) 1997-2002 Jeffrey Hobbs
  *
- * See the file "license.terms" for information on usage and redistribution
+ * See the file "license.txt" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
+ * RCS: @(#) $Id: tkTable.h,v 1.17 2002/11/15 22:19:52 cerney Exp $
  */
 
 #ifndef _TKTABLE_H_
 #define _TKTABLE_H_
 
-/* Enable Postscript output */
-#define POSTSCRIPT
 
 
 #include <string.h>
@@ -30,8 +29,16 @@
 # include <X11/Xatom.h>
 #endif /* MAC_TCL */
 
-#if (TCL_MINOR_VERSION == 0) /* Tcl8.0 stuff */
+#if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION == 0) /* Tcl8.0 stuff */
 #define Tcl_GetString(objPtr)	Tcl_GetStringFromObj(objPtr, (int *)NULL)
+#endif
+
+/*
+ * Tcl/Tk 8.4 introduced better CONST-ness in the APIs, but we use CONST84 in
+ * some cases for compatibility with earlier Tcl headers to prevent warnings.
+ */
+#ifndef CONST84
+#  define CONST84
 #endif
 
 /* This EXTERN declaration is needed for Tcl < 8.0.3 */
@@ -46,13 +53,11 @@
 #ifdef TCL_STORAGE_CLASS
 # undef TCL_STORAGE_CLASS
 #endif
-#ifdef BUILD_tkTable
+#ifdef BUILD_Tktable
 # define TCL_STORAGE_CLASS DLLEXPORT
 #else
 # define TCL_STORAGE_CLASS DLLIMPORT
 #endif
-
-#include "mm.h"
 
 #ifdef WIN32
 #   define WIN32_LEAN_AND_MEAN
@@ -64,23 +69,12 @@
 #   endif
 #endif
 
-#if defined(WIN32) || defined(MAC_TCL)
+#if defined(WIN32) || defined(MAC_TCL) || defined(MAC_OSX_TK)
 /* XSync call defined in the internals for some reason */
 #   ifndef XSync
 #	define XSync(display, bool) {display->request++;}
 #   endif
 #endif /* defn of XSync */
-
-#ifdef INLINE
-#   undef INLINE
-#endif
-#ifdef __GNUC__
-#   define INLINE inline
-#elif defined(_MSC_VER)
-#   define INLINE __inline
-#else
-#   define INLINE
-#endif /* INLINE defn */
 
 #ifndef NORMAL_BG
 #   ifdef WIN32
@@ -91,7 +85,7 @@
 #	define DISABLED		"SystemDisabledText"
 #	define HIGHLIGHT	"SystemWindowFrame"
 #	define DEF_TABLE_FONT	"{MS Sans Serif} 8"
-#   elif defined(MAC_TCL)
+#   elif defined(MAC_TCL) || defined(MAC_OSX_TK)
 #	define NORMAL_BG	"systemWindowBody"
 #	define ACTIVE_BG	"#ececec"
 #	define SELECT_BG	"systemHighlight"
@@ -116,6 +110,7 @@
 				( ((val)>(max)) ? (max) : (val) ) )
 #define CONSTRAIN(val,min,max)	if ((val) < (min)) { (val) = (min); } \
 				else if ((val) > (max)) { (val) = (max); }
+#define STREQ(s1, s2)	(strcmp((s1), (s2)) == 0)
 #define ARSIZE(A)	(sizeof(A)/sizeof(*A))
 #define INDEX_BUFSIZE	32		/* max size of buffer for indices */
 #define TEST_KEY	"#TEST KEY#"	/* index for testing array existence */
@@ -192,173 +187,219 @@
 #define	DATA_ARRAY	(1<<2)
 #define DATA_COMMAND	(1<<3)
 
+/*
+ * Definitions for configuring -borderwidth
+ */
+#define BD_TABLE	0
+#define BD_TABLE_TAG	(1<<1)
+#define BD_TABLE_WIN	(1<<2)
+
+/*
+ * Possible state values for tags
+ */
 typedef enum {
-  STATE_UNUSED, STATE_UNKNOWN, STATE_HIDDEN,
-  STATE_NORMAL, STATE_DISABLED, STATE_ACTIVE,
-  STATE_LAST
+    STATE_UNUSED, STATE_UNKNOWN, STATE_HIDDEN,
+    STATE_NORMAL, STATE_DISABLED, STATE_ACTIVE, STATE_LAST
 } TableState;
 
-/* The tag structure */
+/*
+ * Structure for use in parsing table commands/values.
+ * Accessor functions defined in tkTableUtil.c
+ */
 typedef struct {
-  Tk_3DBorder	bg;		/* background color */
-  Tk_3DBorder	fg;		/* foreground color */
-  int		bd;		/* cell border width */
-  int		relief;		/* relief type */
-  Tk_Font	tkfont;		/* Information about text font, or NULL. */
-  Tk_Anchor	anchor;		/* default anchor point */
-  char *	imageStr;	/* name of image */
-  Tk_Image	image;		/* actual pointer to image, if any */
-  TableState	state;		/* state of the cell */
-  Tk_Justify	justify;	/* justification of text in the cell */
-  int		multiline;	/* wrapping style of multiline text */
-  int		wrap;		/* wrapping style of multiline text */
-  int		showtext;	/* whether to display text over image */
+  char *name;		/* name of the command/value */
+  int value;		/* >0 because 0 represents an error or proc */
+} Cmd_Struct;
+
+/*
+ * The tag structure
+ */
+typedef struct {
+    Tk_3DBorder	bg;		/* background color */
+    Tk_3DBorder	fg;		/* foreground color */
+
+    char *	borderStr;	/* border style */
+    int		borders;	/* number of borders specified (1, 2 or 4) */
+    int		bd[4];		/* cell border width */
+
+    int		relief;		/* relief type */
+    Tk_Font	tkfont;		/* Information about text font, or NULL. */
+    Tk_Anchor	anchor;		/* default anchor point */
+    char *	imageStr;	/* name of image */
+    Tk_Image	image;		/* actual pointer to image, if any */
+    TableState	state;		/* state of the cell */
+    Tk_Justify	justify;	/* justification of text in the cell */
+    int		multiline;	/* wrapping style of multiline text */
+    int		wrap;		/* wrapping style of multiline text */
+    int		showtext;	/* whether to display text over image */
 } TableTag;
 
 /*  The widget structure for the table Widget */
 
 typedef struct {
-  /* basic information about the window and the interpreter */
-  Tk_Window tkwin;
-  Display *display;
-  Tcl_Interp *interp;
-  Tcl_Command widgetCmd;	/* Token for entry's widget command. */
-  /* Configurable Options */
-  int autoClear;
-  char *selectMode;		/* single, browse, multiple, or extended */
-  int selectType;		/* row, col, both, or cell */
-  int selectTitles;		/* whether to do automatic title selection */
-  int rows, cols;		/* number of rows and columns */
-  int defRowHeight;		/* default row height in chars (positive)
+    /* basic information about the window and the interpreter */
+    Tk_Window tkwin;
+    Display *display;
+    Tcl_Interp *interp;
+    Tcl_Command widgetCmd;	/* Token for entry's widget command. */
+
+    /*
+     * Configurable Options
+     */
+    int autoClear;
+    char *selectMode;		/* single, browse, multiple, or extended */
+    int selectType;		/* row, col, both, or cell */
+    int selectTitles;		/* whether to do automatic title selection */
+    int rows, cols;		/* number of rows and columns */
+    int defRowHeight;		/* default row height in chars (positive)
 				 * or pixels (negative) */
-  int defColWidth;		/* default column width in chars (positive)
+    int defColWidth;		/* default column width in chars (positive)
 				 * or pixels (negative) */
-  int maxReqCols;		/* the requested # cols to display */
-  int maxReqRows;		/* the requested # rows to display */
-  int maxReqWidth;		/* the maximum requested width in pixels */
-  int maxReqHeight;		/* the maximum requested height in pixels */
+    int maxReqCols;		/* the requested # cols to display */
+    int maxReqRows;		/* the requested # rows to display */
+    int maxReqWidth;		/* the maximum requested width in pixels */
+    int maxReqHeight;		/* the maximum requested height in pixels */
   Var arrayVar;			/* name of traced array variable */
-  char *rowSep;			/* separator string to place between
+    char *rowSep;		/* separator string to place between
 				 * rows when getting selection */
-  char *colSep;			/* separator string to place between
+    char *colSep;		/* separator string to place between
 				 * cols when getting selection */
-  TableTag defaultTag;		/* the default tag colors/fonts etc */
-  LangCallback *yScrollCmd;	/* the y-scroll command */
-  LangCallback *xScrollCmd;	/* the x-scroll command */
-  LangCallback *browseCmd;	/* the command that is called when the
+    TableTag defaultTag;	/* the default tag colors/fonts etc */
+    LangCallback *yScrollCmd;	/* the y-scroll command */
+    LangCallback *xScrollCmd;	/* the x-scroll command */
+    LangCallback *browseCmd; 	/* the command that is called when the
 				 * active cell changes */
-  int caching;			/* whether to cache values of table */
-  LangCallback *command;	/* A command to eval when get/set occurs
+    int caching;		/* whether to cache values of table */
+    LangCallback *command;	/* A command to eval when get/set occurs
 				 * for table values */
-  int useCmd;			/* Signals whether to use command or the
+    int useCmd;			/* Signals whether to use command or the
 				 * array variable, will be 0 if command errs */
-  LangCallback *selCmd;		/* the command that is called to when a
+    LangCallback *selCmd;	/* the command that is called to when a
 				 * [selection get] call occurs for a table */
-  LangCallback *valCmd;		/* Command prefix to use when invoking
+    LangCallback *valCmd;	/* Command prefix to use when invoking
 				 * validate command.  NULL means don't
 				 * invoke commands.  Malloc'ed. */
-  int validate;			/* Non-zero means try to validate */
-  Tk_3DBorder insertBg;		/* the cursor color */
-  Tk_Cursor cursor;		/* the regular mouse pointer */
-  Tk_Cursor bdcursor;		/* the mouse pointer when over borders */
-  int exportSelection;		/* Non-zero means tie internal table
+    int validate;		/* Non-zero means try to validate */
+    Tk_3DBorder insertBg;	/* the cursor color */
+    Tk_Cursor cursor;		/* the regular mouse pointer */
+    Tk_Cursor bdcursor;		/* the mouse pointer when over borders */
+#ifdef TITLE_CURSOR
+    Tk_Cursor titleCursor;	/* the mouse pointer when over titles */
+#endif
+    int exportSelection;	/* Non-zero means tie internal table
 				 * to X selection. */
-  TableState state;		/* Normal or disabled.  Table is read-only
+    TableState state;		/* Normal or disabled.	Table is read-only
 				 * when disabled. */
-  int insertWidth;		/* Total width of insert cursor. */
-  int insertBorderWidth;	/* Width of 3-D border around insert cursor. */
-  int insertOnTime;		/* Number of milliseconds cursor should spend
+    int insertWidth;		/* Total width of insert cursor. */
+    int insertBorderWidth;	/* Width of 3-D border around insert cursor. */
+    int insertOnTime;		/* Number of milliseconds cursor should spend
 				 * in "on" state for each blink. */
-  int insertOffTime;		/* Number of milliseconds cursor should spend
+    int insertOffTime;		/* Number of milliseconds cursor should spend
 				 * in "off" state for each blink. */
-  int invertSelected;           /* Whether to draw selected cells swapping
-                                   foreground and background */
-  int colStretch;		/* The way to stretch columns if the window
-				   is too large */
-  int rowStretch;		/* The way to stretch rows if the window is
-				   too large */
-  int colOffset;		/* X index of leftmost col in the display */
-  int rowOffset;		/* Y index of topmost row in the display */
-  int drawMode;			/* The mode to use when redrawing */
-  int flashMode;		/* Specifies whether flashing is enabled */
-  int flashTime;		/* The number of ms to flash a cell for */
-  int resize;			/* -resizeborders option for interactive
+    int invertSelected;		/* Whether to draw selected cells swapping
+				 * foreground and background */
+    int colStretch;		/* The way to stretch columns if the window
+				 * is too large */
+    int rowStretch;		/* The way to stretch rows if the window is
+				 * too large */
+    int colOffset;		/* X index of leftmost col in the display */
+    int rowOffset;		/* Y index of topmost row in the display */
+    int drawMode;		/* The mode to use when redrawing */
+    int flashMode;		/* Specifies whether flashing is enabled */
+    int flashTime;		/* The number of ms to flash a cell for */
+    int resize;			/* -resizeborders option for interactive
 				 * resizing of borders */
-  int sparse;			/* Whether to use "sparse" arrays by
+    int sparse;			/* Whether to use "sparse" arrays by
 				 * deleting empty array elements (default) */
-  LangCallback *rowTagCmd,
-               *colTagCmd;	/* script to eval for getting row/tag cmd */
-  int highlightWidth;		/* Width in pixels of highlight to draw
+    LangCallback *rowTagCmd,
+    		 *colTagCmd;	/* script to eval for getting row/tag cmd */
+    int highlightWidth;		/* Width in pixels of highlight to draw
 				 * around widget when it has the focus.
 				 * <= 0 means don't draw a highlight. */
-  XColor *highlightBgColorPtr;	/* Color for drawing traversal highlight
+    XColor *highlightBgColorPtr;/* Color for drawing traversal highlight
 				 * area when highlight is off. */
-  XColor *highlightColorPtr;	/* Color for drawing traversal highlight. */
-  char *takeFocus;		/* Used only in Tcl to check if this
+    XColor *highlightColorPtr;	/* Color for drawing traversal highlight. */
+    char *takeFocus;		/* Used only in Tcl to check if this
 				 * widget will accept focus */
-  int padX, padY;		/* Extra space around text (pixels to leave
+    int padX, padY;		/* Extra space around text (pixels to leave
 				 * on each side).  Ignored for bitmaps and
 				 * images. */
+    int ipadX, ipadY;		/* Space to leave empty around cell borders.
+				 * This differs from pad* in that it is always
+				 * present for the cell (except windows). */
 
-  /* Cached Information */
-  int titleRows, titleCols;	/* the number of rows|cols to use as a title */
-  /* these are kept in real coords */
-  int topRow, leftCol;		/* The topleft cell to display excluding the
+    /*
+     * Cached Information
+     */
+#ifdef TITLE_CURSOR
+    Tk_Cursor *lastCursorPtr;	/* pointer to last cursor defined. */
+#endif
+    int titleRows, titleCols;	/* the number of rows|cols to use as a title */
+    /* these are kept in real coords */
+    int topRow, leftCol;	/* The topleft cell to display excluding the
 				 * fixed title rows.  This is just the
 				 * config request.  The actual cell used may
 				 * be different to keep the screen full */
-  int anchorRow, anchorCol;	/* the row,col of the anchor cell */
-  int activeRow, activeCol;	/* the row,col of the active cell */
-  int oldTopRow, oldLeftCol;	/* cached by TableAdjustParams */
-  int oldActRow, oldActCol;	/* cached by TableAdjustParams */
-  int icursor;			/* The index of the insertion cursor in the
-				   active cell */
-  int flags;			/* An or'ed combination of flags concerning
-				   redraw/cursor etc. */
-  int dataSource;		/* where our data comes from:
+    int anchorRow, anchorCol;	/* the row,col of the anchor cell */
+    int activeRow, activeCol;	/* the row,col of the active cell */
+    int oldTopRow, oldLeftCol;	/* cached by TableAdjustParams */
+    int oldActRow, oldActCol;	/* cached by TableAdjustParams */
+    int icursor;		/* The index of the insertion cursor in the
+				 * active cell */
+    int flags;			/* An or'ed combination of flags concerning
+				 * redraw/cursor etc. */
+    int dataSource;		/* where our data comes from:
 				 * DATA_{NONE,CACHE,ARRAY,COMMAND} */
-  int maxWidth, maxHeight;	/* max width|height required in pixels */
-  int charWidth, charHeight;	/* size of a character in the default font */
-  int *colPixels, *rowPixels;	/* Array of the pixel widths/heights */
-  int *colStarts, *rowStarts;	/* Array of start pixels for rows|columns */
-  int scanMarkX, scanMarkY;	/* Used by "scan" and "border" to mark */
-  int scanMarkRow, scanMarkCol;	/* necessary information for dragto */
-  /* values in these are kept in user coords */
-  Tcl_HashTable *cache;		/* value cache */
-  /* colWidths and rowHeights are indexed from 0, so always adjust numbers
-     by the appropriate *Offset factor */
-  Tcl_HashTable *colWidths;	/* hash table of non default column widths */
-  Tcl_HashTable *rowHeights;	/* hash table of non default row heights */
-  Tcl_HashTable *spanTbl;	/* table for spans */
-  Tcl_HashTable *spanAffTbl;	/* table for cells affected by spans */
-  Tcl_HashTable *tagTable;	/* table for style tags */
-  Tcl_HashTable *winTable;	/* table for embedded windows */
-  Tcl_HashTable *rowStyles;	/* table for row styles */
-  Tcl_HashTable *colStyles;	/* table for col styles */
-  Tcl_HashTable *cellStyles;	/* table for cell styles */
-  Tcl_HashTable *flashCells;	/* table of flashing cells */
-  Tcl_HashTable *selCells;	/* table of selected cells */
-  Tcl_TimerToken cursorTimer;	/* timer token for the cursor blinking */
-  Tcl_TimerToken flashTimer;	/* timer token for the cell flashing */
-  char *activeBuf;		/* buffer where the selection is kept
-				   for editing the active cell */
-  TableTag *activeTagPtr;	/* cache of active composite tag */
-  int activeX, activeY;		/* cache offset of active layout in cell */
+    int maxWidth, maxHeight;	/* max width|height required in pixels */
+    int charWidth, charHeight;	/* size of a character in the default font */
+    int *colPixels, *rowPixels;	/* Array of the pixel widths/heights */
+    int *colStarts, *rowStarts;	/* Array of start pixels for rows|columns */
+    int scanMarkX, scanMarkY;	/* Used by "scan" and "border" to mark */
+    int scanMarkRow, scanMarkCol;/* necessary information for dragto */
+    /* values in these are kept in user coords */
+    Tcl_HashTable *cache;	/* value cache */
 
-#ifdef PROCS
-  Tcl_HashTable *inProc;	/* cells where proc is being evaled */
-  int showProcs;		/* whether to show embedded proc (1) or
-				 * its calculated value (0) */
-  int hasProcs;			/* whether table has embedded procs or not */
+    /*
+     * colWidths and rowHeights are indexed from 0, so always adjust numbers
+     * by the appropriate *Offset factor
+     */
+    Tcl_HashTable *colWidths;	/* hash table of non default column widths */
+    Tcl_HashTable *rowHeights;	/* hash table of non default row heights */
+    Tcl_HashTable *spanTbl;	/* table for spans */
+    Tcl_HashTable *spanAffTbl;	/* table for cells affected by spans */
+    Tcl_HashTable *tagTable;	/* table for style tags */
+    Tcl_HashTable *winTable;	/* table for embedded windows */
+    Tcl_HashTable *rowStyles;	/* table for row styles */
+    Tcl_HashTable *colStyles;	/* table for col styles */
+    Tcl_HashTable *cellStyles;	/* table for cell styles */
+    Tcl_HashTable *flashCells;	/* table of flashing cells */
+    Tcl_HashTable *selCells;	/* table of selected cells */
+    Tcl_TimerToken cursorTimer;	/* timer token for the cursor blinking */
+    Tcl_TimerToken flashTimer;	/* timer token for the cell flashing */
+    char *activeBuf;		/* buffer where the selection is kept
+				 * for editing the active cell */
+    char **tagPrioNames;	/* list of tag names in priority order */
+    TableTag **tagPrios;	/* list of tag pointers in priority order */
+    TableTag *activeTagPtr;	/* cache of active composite tag */
+    int activeX, activeY;	/* cache offset of active layout in cell */
+    int tagPrioSize;		/* size of tagPrios list */
+    int tagPrioMax;		/* max allocated size of tagPrios list */
+
+    /* The invalid rectangle if there is an update pending */
+    int invalidX, invalidY, invalidWidth, invalidHeight;
+    int seen[4];			/* see TableUndisplay */
+
+#ifdef POSTSCRIPT
+    /* Pointer to information used for generating Postscript for the canvas.
+     * NULL means no Postscript is currently being generated. */
+    struct TkPostscriptInfo *psInfoPtr;
 #endif
 
-  /* The invalid rectangle if there is an update pending */
-  int invalidX, invalidY, invalidWidth, invalidHeight;
-  int seen[4];			/* see TableUndisplay */
-#ifdef POSTSCRIPT
-  /* Pointer to information used for generating Postscript for the canvas.
-   * NULL means no Postscript is currently being generated. */
-  struct TkPostscriptInfo *psInfoPtr;
+#ifdef PROCS
+    Tcl_HashTable *inProc;	/* cells where proc is being evaled */
+    int showProcs;		/* whether to show embedded proc (1) or
+				 * its calculated value (0) */
+    int hasProcs;		/* whether table has embedded procs or not */
 #endif
 } Table;
 
@@ -372,24 +413,26 @@ typedef struct {
  */
 
 typedef struct TableEmbWindow {
-  Table *tablePtr;		/* Information about the overall table
+    Table *tablePtr;		/* Information about the overall table
 				 * widget. */
-  Tk_Window tkwin;		/* Window for this segment.  NULL
-				 * means that the window hasn't
-				 * been created yet. */
-  Tcl_HashEntry *hPtr;		/* entry into winTable */
-  Tk_3DBorder bg;		/* background color */
-  LangCallback *create;		/* Script to create window on-demand.
+    Tk_Window tkwin;		/* Window for this segment.  NULL means that
+				 * the window hasn't been created yet. */
+    Tcl_HashEntry *hPtr;	/* entry into winTable */
+    LangCallback *create;	/* Script to create window on-demand.
 				 * NULL means no such script.
 				 * Malloc-ed. */
-  int bd;			/* border width for cell around window */
-  int relief;			/* relief type */
-  int sticky;			/* How to align window in space */
-  int padX, padY;		/* Padding to leave around each side
+    Tk_3DBorder bg;		/* background color */
+
+    char *borderStr;		/* border style */
+    int borders;		/* number of borders specified (1, 2 or 4) */
+    int bd[4];			/* border width for cell around window */
+
+    int relief;			/* relief type */
+    int sticky;			/* How to align window in space */
+    int padX, padY;		/* Padding to leave around each side
 				 * of window, in pixels. */
-  int displayed;		/* Non-zero means that the window
-				 * has been displayed on the screen
-				 * recently. */
+    int displayed;		/* Non-zero means that the window has been
+				 * displayed on the screen recently. */
 } TableEmbWindow;
 
 extern Tk_ConfigSpec tableSpecs[];
@@ -408,12 +451,12 @@ extern int	Table_WinDelete _ANSI_ARGS_((register Table *tablePtr,
 extern int	Table_WindowCmd _ANSI_ARGS_((ClientData clientData,
 			Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
 extern int	TableValidateChange _ANSI_ARGS_((Table *tablePtr, int r,
-			int c, char *old, char *new, int index));
+			int c, char *oldVal, char *newVal, int idx));
 extern void	TableLostSelection _ANSI_ARGS_((ClientData clientData));
 extern void	TableSetActiveIndex _ANSI_ARGS_((register Table *tablePtr));
 
 /*
- * HEADERS IN TKTABLECMDS
+ * HEADERS IN tkTableCmds.c
  */
 
 extern int	Table_ActivateCmd _ANSI_ARGS_((ClientData clientData,
@@ -448,24 +491,27 @@ extern int	Table_ViewCmd _ANSI_ARGS_((ClientData clientData,
 			Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
 
 /*
- * HEADERS IN tkTableEdit
+ * HEADERS IN tkTableEdit.c
  */
 
 extern int	Table_EditCmd _ANSI_ARGS_((ClientData clientData,
 			Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
 extern void	TableDeleteChars _ANSI_ARGS_((register Table *tablePtr,
-			int index, int count));
+			int idx, int count));
 extern void	TableInsertChars _ANSI_ARGS_((register Table *tablePtr,
-			int index, char *string));
+			int idx, char *string));
 
 /*
- * HEADERS IN TKTABLETAG
+ * HEADERS IN tkTableTag.c
  */
 
-extern TableTag *TableNewTag _ANSI_ARGS_((void));
-extern void	TableMergeTag _ANSI_ARGS_((TableTag *baseTag,
+extern TableTag *TableNewTag _ANSI_ARGS_((Table *tablePtr));
+extern void	TableResetTag _ANSI_ARGS_((Table *tablePtr, TableTag *tagPtr));
+extern void	TableMergeTag _ANSI_ARGS_((Table *tablePtr, TableTag *baseTag,
 			TableTag *addTag));
 extern void	TableInvertTag _ANSI_ARGS_((TableTag *baseTag));
+extern int	TableGetTagBorders _ANSI_ARGS_((TableTag *tagPtr,
+			int *left, int *right, int *top, int *bottom));
 extern void	TableInitTags _ANSI_ARGS_((Table *tablePtr));
 extern TableTag *FindRowColTag _ANSI_ARGS_((Table *tablePtr,
 			int cell, int type));
@@ -475,7 +521,28 @@ extern int	Table_TagCmd _ANSI_ARGS_((ClientData clientData,
 			Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
 
 /*
- * HEADERS IN TKTABLECELL
+ * HEADERS IN tkTableUtil.c
+ */
+
+extern void	Table_ClearHashTable _ANSI_ARGS_((Tcl_HashTable *hashTblPtr));
+extern int	TableOptionBdSet _ANSI_ARGS_((ClientData clientData,
+			Tcl_Interp *interp, Tk_Window tkwin,
+			Arg value, char *widgRec, int offset));
+extern Arg	TableOptionBdGet _ANSI_ARGS_((ClientData clientData,
+			Tk_Window tkwin, char *widgRec, int offset,
+			Tcl_FreeProc **freeProcPtr));
+extern int	TableTagConfigureBd _ANSI_ARGS_((Table *tablePtr,
+			TableTag *tagPtr, Arg oldValue, int nullOK));
+extern int	Cmd_OptionSet _ANSI_ARGS_((ClientData clientData,
+			Tcl_Interp *interp,
+			Tk_Window unused, Arg value,
+			char *widgRec, int offset));
+extern Arg	Cmd_OptionGet _ANSI_ARGS_((ClientData clientData,
+			Tk_Window unused, char *widgRec,
+			int offset, Tcl_FreeProc **freeProcPtr));
+
+/*
+ * HEADERS IN tkTableCell.c
  */
 
 extern int	TableTrueCell _ANSI_ARGS_((Table *tablePtr, int row, int col,
@@ -492,6 +559,10 @@ extern int	TableAtBorder _ANSI_ARGS_((Table *tablePtr, int x, int y,
 extern char *	TableGetCellValue _ANSI_ARGS_((Table *tablePtr, int r, int c));
 extern int	TableSetCellValue _ANSI_ARGS_((Table *tablePtr, int r, int c,
 			char *value));
+extern int    TableMoveCellValue _ANSI_ARGS_((Table *tablePtr,
+			int fromr, int fromc, char *frombuf,
+			int tor, int toc, char *tobuf, int outOfBounds));
+
 extern int	TableGetIcursor _ANSI_ARGS_((Table *tablePtr, char *arg,
 			int *posn));
 #define TableGetIcursorObj(tablePtr, objPtr, posnPtr) \
@@ -540,25 +611,24 @@ extern void	Tcl_DStringAppendAll _ANSI_ARGS_(TCL_VARARGS(Tcl_DString *, arg1));
 EXTERN int Tktable_Init		_ANSI_ARGS_((Tcl_Interp *interp));
 EXTERN int Tktable_SafeInit	_ANSI_ARGS_((Tcl_Interp *interp));
 
-int	TableConfigure _ANSI_ARGS_((Tcl_Interp *interp,
-			Table *tablePtr, int objc, Tcl_Obj *CONST objv[],
-			int flags, int forceUpdate));
 extern void	TableGetActiveBuf _ANSI_ARGS_((register Table *tablePtr));
 extern void	ExpandPercents _ANSI_ARGS_((Table *tablePtr, char *before,
-			int r, int c, char *old, char *new, int index,
+			int r, int c, char *oldVal, char *newVal, int idx,
 			Tcl_DString *dsPtr, int cmdType));
 extern void	TableInvalidate _ANSI_ARGS_((Table *tablePtr, int x, int y,
 			int width, int height, int force));
 extern void	TableRefresh _ANSI_ARGS_((register Table *tablePtr,
 			int arg1, int arg2, int mode));
-void	TableGeometryRequest _ANSI_ARGS_((Table *tablePtr));
-void	TableAdjustActive _ANSI_ARGS_((register Table *tablePtr));
-void	TableAdjustParams _ANSI_ARGS_((register Table *tablePtr));
-void	TableConfigCursor _ANSI_ARGS_((register Table *tablePtr));
+extern void	TableGeometryRequest _ANSI_ARGS_((Table *tablePtr));
+extern void	TableAdjustActive _ANSI_ARGS_((register Table *tablePtr));
+extern void	TableAdjustParams _ANSI_ARGS_((register Table *tablePtr));
+extern void	TableConfigCursor _ANSI_ARGS_((register Table *tablePtr));
+extern void	TableAddFlash _ANSI_ARGS_((Table *tablePtr, int row, int col));
 
-#define TableInvalidateAll(tablePtr, flags)	\
+
+#define TableInvalidateAll(tablePtr, flags) \
 	TableInvalidate((tablePtr), 0, 0, Tk_Width((tablePtr)->tkwin),\
-			Tk_Height((tablePtr)->tkwin), (flags))
+		Tk_Height((tablePtr)->tkwin), (flags))
 
      /*
       * Turn row/col into an index into the table
@@ -574,11 +644,11 @@ void	TableConfigCursor _ANSI_ARGS_((register Table *tablePtr));
      /*
       * Macro for finding the last cell of the table
       */
-#define TableGetLastCell(tablePtr, rowPtr, colPtr)	\
+#define TableGetLastCell(tablePtr, rowPtr, colPtr) \
 	TableWhatCell((tablePtr),\
-		      Tk_Width((tablePtr)->tkwin)-(tablePtr)->highlightWidth-1,\
-		      Tk_Height((tablePtr)->tkwin)-(tablePtr)->highlightWidth-1,\
-		      (rowPtr), (colPtr))
+		Tk_Width((tablePtr)->tkwin)-(tablePtr)->highlightWidth-1,\
+		Tk_Height((tablePtr)->tkwin)-(tablePtr)->highlightWidth-1,\
+		(rowPtr), (colPtr))
 
 EXTERN int	Tk_TableObjCmd _ANSI_ARGS_((ClientData clientData,
 			Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));

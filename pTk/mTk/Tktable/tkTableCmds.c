@@ -4,9 +4,9 @@
  *	This module implements general commands of a table widget,
  *	based on the major/minor command structure.
  *
- * Copyright (c) 1998-1999 Jeffrey Hobbs
+ * Copyright (c) 1998-2002 Jeffrey Hobbs
  *
- * See the file "license.terms" for information on usage and redistribution
+ * See the file "license.txt" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
  */
@@ -115,14 +115,14 @@ Table_ActivateCmd(ClientData clientData, register Tcl_Interp *interp,
 
 		tablePtr->icursor = Tk_PointToChar(textLayout, x, y);
 		Tk_FreeTextLayout(textLayout);
-		TableConfigCursor(tablePtr);
+		TableRefresh(tablePtr, row, col, CELL|INV_FORCE);
 	    }
 	}
 	tablePtr->flags |= HAS_ACTIVE;
     }
     return result;
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -228,7 +228,7 @@ Table_AdjustCmd(ClientData clientData, register Tcl_Interp *interp,
     }
     return TCL_OK;
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -304,8 +304,8 @@ Table_BboxCmd(ClientData clientData, register Tcl_Interp *interp,
     }
     return TCL_OK;
 }
-
-static char *bdCmdNames[] = {
+
+static CONST84 char *bdCmdNames[] = {
     "mark", "dragto", (char *)NULL
 };
 enum bdCmd {
@@ -435,10 +435,9 @@ Table_BorderCmd(ClientData clientData, register Tcl_Interp *interp,
     }
     return TCL_OK;
 }
-
-
+
 /* clear subcommands */
-static char *clearNames[] = {
+static CONST84 char *clearNames[] = {
     "all", "cache", "sizes", "tags", (char *)NULL
 };
 enum clearCommand {
@@ -507,7 +506,7 @@ Table_ClearCmd(ClientData clientData, register Tcl_Interp *interp,
 	}
 
 	if (cmdIndex == CLEAR_CACHE || cmdIndex == CLEAR_ALL) {
-	    Tcl_DeleteHashTable(tablePtr->cache);
+	    Table_ClearHashTable(tablePtr->cache);
 	    Tcl_InitHashTable(tablePtr->cache, TCL_STRING_KEYS);
 	    /* If we were caching and we have no other data source,
 	     * invalidate all the cells */
@@ -519,7 +518,7 @@ Table_ClearCmd(ClientData clientData, register Tcl_Interp *interp,
     } else {
 	int row, col, r1, r2, c1, c2;
 	Tcl_HashEntry *entryPtr;
-	char buf[INDEX_BUFSIZE];
+	char buf[INDEX_BUFSIZE], *value;
 
 	if (TableGetIndexObj(tablePtr, objv[3], &row, &col) != TCL_OK ||
 	    ((objc == 5) &&
@@ -587,6 +586,8 @@ Table_ClearCmd(ClientData clientData, register Tcl_Interp *interp,
 
 		if ((cmdIndex == CLEAR_CACHE || cmdIndex == CLEAR_ALL) &&
 		    (entryPtr = Tcl_FindHashEntry(tablePtr->cache, buf))) {
+		    value = (char *) Tcl_GetHashValue(entryPtr);
+		    if (value) { ckfree(value); }
 		    Tcl_DeleteHashEntry(entryPtr);
 		    /* if the cache is our data source,
 		     * we need to invalidate the cells changed */
@@ -611,7 +612,7 @@ Table_ClearCmd(ClientData clientData, register Tcl_Interp *interp,
     }
     return TCL_OK;
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -674,7 +675,7 @@ Table_CurselectionCmd(ClientData clientData, register Tcl_Interp *interp,
     }
     return TCL_OK;
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -698,7 +699,7 @@ Table_CurvalueCmd(ClientData clientData, register Tcl_Interp *interp,
     register Table *tablePtr = (Table *) clientData;
 
     if (objc > 3) {
-	Tcl_WrongNumArgs(interp, 2, objv, "curvalue ?<value>?");
+	Tcl_WrongNumArgs(interp, 2, objv, "?<value>?");
 	return TCL_ERROR;
     } else if (!(tablePtr->flags & HAS_ACTIVE)) {
 	return TCL_OK;
@@ -709,7 +710,7 @@ Table_CurvalueCmd(ClientData clientData, register Tcl_Interp *interp,
 	int len;
 
 	value = Tcl_GetStringFromObj(objv[2], &len);
-	if (strcmp(value, tablePtr->activeBuf) == 0) {
+	if (STREQ(value, tablePtr->activeBuf)) {
 	    Tcl_SetObjResult(interp, objv[2]);
 	    return TCL_OK;
 	}
@@ -736,7 +737,7 @@ Table_CurvalueCmd(ClientData clientData, register Tcl_Interp *interp,
     Tcl_SetStringObj(Tcl_GetObjResult(interp), tablePtr->activeBuf, -1);
     return TCL_OK;
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -758,7 +759,6 @@ Table_GetCmd(ClientData clientData, register Tcl_Interp *interp,
 	     int objc, Tcl_Obj *CONST objv[])
 {
     register Table *tablePtr = (Table *) clientData;
-    Tcl_Obj *resultPtr = Tcl_GetObjResult(interp);
     int result = TCL_OK;
     int r1, c1, r2, c2, row, col;
     if (objc < 3 || objc > 4) {
@@ -767,33 +767,27 @@ Table_GetCmd(ClientData clientData, register Tcl_Interp *interp,
     } else if (TableGetIndexObj(tablePtr, objv[2], &row, &col) == TCL_ERROR) {
 	result = TCL_ERROR;
     } else if (objc == 3) {
-        /* Copy the cell contents to another string, 
-	     otherwise the perltk Tcl_SetStringObj appears to
-	     clobber the string contents */
-    	char *contents;
-    	char *val;
-	contents = TableGetCellValue(tablePtr, row, col);
-	val = (char *)ckalloc(strlen(contents)+1);
-	strcpy(val, contents);
-	Tcl_SetStringObj(resultPtr, val, -1);
+	Tcl_SetObjResult(interp,
+		Tcl_NewStringObj(TableGetCellValue(tablePtr, row, col), -1));
     } else if (TableGetIndexObj(tablePtr, objv[3], &r2, &c2) == TCL_ERROR) {
 	result = TCL_ERROR;
     } else {
-	Tcl_Obj *objPtr;
+	Tcl_Obj *objPtr = Tcl_NewObj();
 
 	r1 = MIN(row,r2); r2 = MAX(row,r2);
 	c1 = MIN(col,c2); c2 = MAX(col,c2);
 	for ( row = r1; row <= r2; row++ ) {
 	    for ( col = c1; col <= c2; col++ ) {
-		objPtr = Tcl_NewStringObj(TableGetCellValue(tablePtr,
-			row, col), -1);
-		Tcl_ListObjAppendElement(NULL, resultPtr, objPtr);
+		Tcl_ListObjAppendElement(NULL, objPtr,
+			Tcl_NewStringObj(TableGetCellValue(tablePtr,
+				row, col), -1));
 	    }
 	}
+	Tcl_SetObjResult(interp, objPtr);
     }
     return result;
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -857,7 +851,7 @@ Table_ScanCmd(ClientData clientData, register Tcl_Interp *interp,
     }
     return TCL_OK;
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -902,7 +896,7 @@ Table_SelAnchorCmd(ClientData clientData, register Tcl_Interp *interp,
     }
     return TCL_OK;
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -933,7 +927,7 @@ Table_SelClearCmd(ClientData clientData, register Tcl_Interp *interp,
 	Tcl_WrongNumArgs(interp, 3, objv, "all|<first> ?<last>?");
 	return TCL_ERROR;
     }
-    if (strcmp(Tcl_GetString(objv[3]), "all") == 0) {
+    if (STREQ(Tcl_GetString(objv[3]), "all")) {
 	Tcl_HashSearch search;
 	for(entryPtr = Tcl_FirstHashEntry(tablePtr->selCells, &search);
 	    entryPtr != NULL; entryPtr = Tcl_NextHashEntry(&search)) {
@@ -993,7 +987,7 @@ CLEAR_CELLS:
     if (key) goto CLEAR_BOTH;
     return result;
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -1030,8 +1024,7 @@ Table_SelIncludesCmd(ClientData clientData, register Tcl_Interp *interp,
     }
     return TCL_OK;
 }
-
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -1138,7 +1131,7 @@ SET_CELLS:
     }
     return TCL_OK;
 }
-
+
 /*
  *--------------------------------------------------------------
  *
@@ -1270,8 +1263,8 @@ Table_ViewCmd(ClientData clientData, register Tcl_Interp *interp,
 
     return TCL_OK;
 }
-
-
+
+#if 0
 /*
  *--------------------------------------------------------------
  *
@@ -1297,4 +1290,4 @@ Table_Cmd(ClientData clientData, register Tcl_Interp *interp,
 
     return result;
 }
-
+#endif

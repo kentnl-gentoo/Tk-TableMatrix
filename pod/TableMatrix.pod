@@ -18,7 +18,7 @@ I<$table> = I<$parent>-E<gt>B<TableMatrix>(?I<options>?);
 B<-anchor  -background  -cursor 
    -exportselection  -font  -foreground    -highlightbackground  -highlightcolor 
  -highlightthickness    -insertbackground  -insertborderwidth  -insertofftime 
-   -insertontime  -insertwidth  -invertselected  -padx    -pady  -relief  -takefocus 
+   -insertontime  -insertwidth  -invertselected  -relief  -takefocus 
  -xscrollcommand    -yscrollcommand>
 
 =head1 Widget-specific Options 
@@ -50,11 +50,16 @@ the value of -resizeborders).  Defaults to I<crosshair >.
 
 =item Class: B<BorderWidth> 
 
-Specifies a non-negative value indicating the width of the 3-D border to 
-draw on interior table cells (if such a border is being drawn; the B<relief 
-> option typically determines this).  This can be overridden by the a tag's 
-borderwidth option.  It can also be affected by the defined B<-drawmode> for 
-the table.  The value may have any of the forms acceptable to B<Tk_GetPixels>. 
+Specifies a non-negative pixel value or list of values indicating the width
+of the 3-D border to draw on interior table cells (if such a border is
+being drawn; the <Brelief> option typically determines this).  If one
+value is specified, a rectangle of this width will be drawn.  If two values
+are specified, then only the left and right edges of the cell will have
+borders.  If four values are specified, then the values correspond to the
+{left right top bottom} edges.  This can be overridden by the a tag's
+borderwidth option.  It can also be affected by the defined
+B<-drawmode> for the table.  Each value in the list must have one of
+the forms acceptable to B<Tk_GetPixels>.
 
 =item Switch: B<-browsecommand or -browsecmd> 
 
@@ -77,7 +82,7 @@ internal cache of the table contents should be kept.  This greatly enhances
 speed performance when used with B<-command > but uses extra memory.  Can maintain 
 state when both B<-command > and B<-variable > are empty.  The cache is automatically 
 flushed whenever the value of B<-cache > or B<-variable > changes, otherwise you 
-have to explicitly B<flush > it.  Defaults to false.
+have to explicitly call B<clear> on it.  Defaults to off.
 
 =item Switch: B<-colorigin> 
 
@@ -285,7 +290,41 @@ all the rows in the table.  The height can be further limited by B<-maxheight
 
 Specifies whether the foreground and background 
 of an item should simply have their values swapped instead of merging 
-the I<sel > tag options when the cell is selected.  Defaults to 0 (merge). 
+the I<sel > tag options when the cell is selected.  Defaults to 0 (merge I<sel> tag). 
+
+=item Switch: B<-ipadx> 
+
+=item Name: B<ipadX> 
+
+=item Class: B<Pad>
+
+A pixel value specifying the internal offset X padding for text in a cell.
+This value does not grow the size of the cell, it just causes the text to
+be drawn further from the cell border.  It only affects one side (depending
+on anchor).  Defaults to 0.  See B<-padx> for an alternate padding
+style.
+
+=item Switch: B<-ipady> 
+
+=item Name: B<ipadY> 
+
+=item Class: B<Pad>
+
+A pixel value specifying the internal offset Y padding for text in a cell.
+This value does not grow the size of the cell, it just causes the text to
+be drawn further from the cell border.  It only affects one side (depending
+on anchor).  Defaults to 0.  See B<-pady> for an alternate padding
+style.
+
+=item Switch: B<-justify> 
+
+=item Name: B<justify> 
+
+=item Class: B<Justify>
+
+How to justify multi-line text in a cell. It must
+be one of B<left>, B<right>, or B<center>. Defaults to
+left.
 
 =item Switch: B<-maxheight> 
 
@@ -313,6 +352,32 @@ to 800.
 
 Specifies the default setting for the multiline tag 
 option.  Defaults to 1.  
+
+=item Switch: B<-pady> 
+
+=item Name: B<padX> 
+
+=item Class: B<Pad>
+
+A pixel value specifying the offset X padding for a cell.  This value
+causes the default size of the cell to increase by two times the value (one
+for each side), unless a specific pixel size is chosen for the cell with
+the B<width> command.  This will force an empty area on the left and
+right of each cell edge.  This padding affects all types of data in the
+cell.  Defaults to 0.  See B<-ipadx> for an alternate padding style.
+
+=item Switch: B<-pady> 
+
+=item Name: B<padY> 
+
+=item Class: B<Pad>
+
+A pixel value specifying the offset Y padding for a cell.  This value
+causes the default size of the cell to increase by two times the value (one
+for each side), unless a specific pixel size is chosen for the cell with
+the B<height> command.  This will force an empty area on the top and
+bottom of each cell edge.  This padding affects all types of data in the
+cell.  Defaults to 0.  See B<-ipadx> for an alternate padding style.
 
 =item Switch: B<-resizeborders> 
 
@@ -579,8 +644,11 @@ table, in any of the following ways:
 
 Specifies the cell 
 as a numerical index of row,col which corresponds to the index of the 
-associated Tcl array, where B<-roworigin,-colorigin > corresponds to the first 
-cell in the table (0,0 by default). 
+associated Perl Hash, where B<-roworigin,-colorigin > corresponds to the first 
+cell in the table (0,0 by default). The values for row
+and column will be constrained to actual values
+in the table, which means a valid cell is
+always found.
 
 =item B<active >  
 
@@ -626,13 +694,13 @@ the above forms.
 
 =head1 Tags 
 
-A tag is a textual string that is associated with 
-zero or more rows, columns or cells in a table.  Tags may contain arbitrary 
-characters, but it is probably best to avoid using names which look like 
-indices.  There may be any number of tags associated with rows, columns 
-or cells in a table.  There are several permanent tags in each table that 
-can be configured by the user and will determine the attributes for special 
-cells:  
+A tag is a textual string that is associated with zero or more rows,
+columns or cells in a table.  Tags may contain arbitrary characters, but it
+is probably best to avoid using names which look like indices to reduce
+coding confusion.  There may be any number of tags in a table, but each
+row, column or cell can only have one tag associated with it at a time.
+There are several permanent tags in each table that can be configured by
+the user and will determine the attributes for special cells:
 
 =over 1
 
@@ -660,7 +728,7 @@ in the title rows and columns.  This tag has B<-state > I<disabled > by default.
 Tags control the way cells are displayed on the screen.  Where appropriate, 
 the default for displaying cells is determined by the options for the 
 table widget.  However, display options may be associated with individual 
-tags using the L<tagConfigure> method.  If a cell has been 
+tags using the L<tagConfigure> method.  If a cell, row or column has been 
 tagged, then the display options associated with the tag override the 
 default display style.  The following options are currently supported for 
 tags:  
@@ -675,9 +743,10 @@ Anchor for item in the cell space.
 
 Background color of the cell. 
 
-=item B<-borderwidth > or B<-bd > I<pixels >  
+=item B<-borderwidth > or B<-bd > I<pixel >  
 
-Borderwidth of the cell. 
+Borderwidth of the cell, of the same format for the table, but may also
+be empty to inherit the default table borderwidth value (the default).
 
 =item B<-font> I<fontName >  
 
@@ -702,14 +771,13 @@ Whether to display text with newlines on multiple lines.
 
 =item B<-relief>  
 
-The relief for the cell. 
+The relief for the cell. May be the empty
+string to cause this tag to not disturb the
+value.
 
 =item B<-showtext> I<boolean>  
 
-Whether to show the 
-text over an image.  This does not currently work on Windows or Mac for 
-all cases due to the lack of clipping support in Tk's X emulation (patch 
-submitted). 
+Whether to show the text over an image.
 
 =item B<-state> I<state>  
 
@@ -723,19 +791,21 @@ Whether characters should wrap in a cell that is not wide enough.
 
 =back
 
-A priority order is defined among tags, and this order is used in implementing 
-some of the tag-related functions described below.  When a cell is displayed, 
-its properties are determined by the tags which are assigned to it.  Including 
-the special tags, this order is B<flash >, B<active >, B<sel >, B<title >, B<celltag 
->, B<rowtag >, B<coltag >, default.
+A priority order is defined among tags based on creation order (first
+created tag has highest default priority), and this order is used in
+implementing some of the tag-related functions described below.  When a cell
+is displayed, its properties are determined by the tags which are assigned
+to it.  The priority of a tag can be modified by the I<tagLower> and the 
+I<tagRaise> methods.
 
-If a cell has several tags types associated with 
-it, and if their display options conflict, then the options of the highest 
-priority tag are used.  If a particular display option hasn't been specified 
-for a particular tag, or if it is specified as an empty string, then that 
-option will never be used; the next-highest-priority tag's option will used 
-instead.  If no tag specifies a particular display option, then the default 
-style for the widget will be used.
+If a cell has several tags associated with it that define the same display
+options (eg - a B<title> cell with specific B<row> and B<cell>
+tags), then the options of the highest priority tag are used.  If a
+particular display option hasn't been specified for a particular tag, or if
+it is specified as an empty string, then that option will not be used; the
+next-highest-priority tag's option will be used instead.  If no tag
+specifies a particular display option, then the default style for the
+widget will be used.
 
 Images are used for display purposes 
 only.  Editing in that cell will still be enabled and any querying of the 
@@ -789,6 +859,11 @@ will be evaluated again the next time the cell is displayed.
 
 Background color of the cell.  If not specified, it uses 
 the table's default background. 
+
+=item B<-borderwidth> or B<-bd> I<pixelList >
+
+Borderwidth of the cell, of the same format for the table, but may also
+be empty to inherit the default table borderwidth value (the default).
 
 =item B<-padx> I<pixels >
 
@@ -1302,10 +1377,12 @@ The following forms of the command are currently supported:
 
 =item I<$table>-E<gt>B<tagCell>(I<tagName, ?index, ...?>)
 
-With no arguments, prints out the list of 
-cells that use the I<tag >. Otherwise it sets the specified cells to use the 
-I<tag >.  If I<tag > is '', the cells are reset to the default I<tag >.  Tags added 
-during -*tagcommand evaluation do not register here. 
+With no arguments, prints out the list of cells that use the I<tag>.
+Otherwise it sets the specified cells to use the named tag, replacing any
+tag that may have been set using this method before.  If I<tagName> is
+'', the cells are reset to the default I<tag>.  Tags added during
+-*tagcommand evaluation do not register here.  If I<tagName> does
+not exist, it will be created with the default options.
 
 =item I<$table>-E<gt>B<tagCget>(I<tagName, option>)
 
@@ -1315,10 +1392,12 @@ any of the values accepted by the B<tag configure > widget command.
 
 =item I<$table>-E<gt>B<tagCol>(I<tagName, ?col, ...?>)
 
-With no arguments, prints out the list of cols 
-that use the I<tag >. Otherwise it sets the specified cols to use the I<tag>.  If I<tag > is '', the cols are reset to the default I<tag >.  Tags added during 
--coltagcommand evaluation do not register here.  If I<tagName > does not exist, 
-it is not created, but nor is an error generated. 
+With no arguments, prints out the list of cols that use the I<tag>.
+Otherwise it sets the specified columns to use the named tag, replacing any
+tag that may have been set using this method before.  If <tagName> is
+'', the cols are reset to the default I<tag>.  Tags added during
+-coltagcommand evaluation do not register here.  If I<tagName> does
+not exist, it will be created with the default options.
 
 =item I<$table>-E<gt>B<tagConfigure>(I<tagName>, ?I<option>?, ?I<value>?, ?I<option, value, ...>?)
 
@@ -1348,19 +1427,35 @@ Returns 1 if the named tag exists, 0 otherwise.
 Returns 1 if the specified index has the 
 named tag, 0 otherwise. 
 
+=item I<$table>-E<gt>B<tagLower>(I<tagName, ?belowThis?>)
+
+Lower the priority of the named tag.  If I<belowThis> is not specified,
+then the tag's priority is lowered to the bottom, otherwise it is lowered
+to one below I<belowThis>.
+
 =item I<$table>-E<gt>B<tagNames>(?I<pattern>?)
 
 If no pattern is 
 specified, shows the names of all defined tags. Otherwise the I<pattern > 
 is used as a glob pattern to show only tags matching that pattern. 
+Tag names are returned in priority order
+(highest priority tag first).
+
+=item I<$table>-E<gt>B<tagRaise>(I<tagName, ?aboveThis?>)
+
+Raise the priority of the named tag.  If I<aboveThis> is not specified,
+then the tag's priority is raised to the top, otherwise it is raised to
+one above I<aboveThis>.
+
 
 =item I<$table>-E<gt>B<tagRow>(I<tagName, ?row, ...?>)
 
-With no arguments, prints out the list of rows 
-that use the I<tag >. Otherwise it sets the specified rows to use the I<tag 
->.  If I<tag > is '', the rows are reset to use the default tag.  Tags added 
-during -rowtagcommand evaluation do not register here.  If I<tagName > does 
-not exist, it is not created, but nor is an error generated.  
+With no arguments, prints out the list of rows that use the I<tag>.
+Otherwise it sets the specified columns to use the named tag, replacing any
+tag that may have been set using this method before.  If I<tagName> is
+'', the rows are reset to use the default tag.  Tags added during
+-rowtagcommand evaluation do not register here.  If I<tagName> does
+not exist, it will be created with the default options.
 
 =back
 
@@ -1458,10 +1553,10 @@ to the left. I<fraction > must be a fraction between 0 and 1.
 This command shifts the view in the window left or 
 right according to I<number > and I<what >. I<Number > must be an integer. I<What > 
 must be either B<units > or B<pages > or an abbreviation of one of these. If 
-I<what > is B<units >, the view adjusts left or right by I<number > character units 
-(the width of the B<0 > character) on the display;  if it is B<pages > then 
-the view adjusts by I<number > screenfuls. If I<number > is negative then characters 
-farther to the left become visible;  if it is positive then characters 
+I<what > is B<units >, the view adjusts left or right by I<number > cells  
+on the display;  if it is B<pages > then 
+the view adjusts by I<number > screenfuls. If I<number > is negative then cells 
+farther to the left become visible;  if it is positive then cells 
 farther to the right become visible.  
 
 =item I<$table>-E<gt>B<yview>(I<?args>?)
@@ -1503,7 +1598,7 @@ the table, and so on.
 
 This command 
 adjusts the view in the window up or down according to I<number > and I<what >.  I<Number > must be an integer.  I<What > must be either B<units > or B<pages >.  If 
-I<what > is B<units >, the view adjusts up or down by I<number > lines; if it is 
+I<what > is B<units >, the view adjusts up or down by I<number > cells; if it is 
 B<pages > then the view adjusts by I<number > screenfuls.  If I<number > is negative 
 then earlier elements become visible; if it is positive then later elements 
 become visible.   

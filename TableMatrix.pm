@@ -3,7 +3,7 @@
 #
 # table.tcl --
 #
-# version align with tkTable 2.4, jeff.hobbs@acm.org
+# version align with tkTable 2.7, jeff.hobbs@acm.org
 # This file defines the default bindings for Tk table widgets
 # and provides procedures that help in implementing those bindings.
 #
@@ -15,6 +15,9 @@
 #			during a selection operation.
 # mouseMoved -		Boolean to indicate whether mouse moved while
 #			the button was pressed.
+# borderInfo -		Boolean to know if the user clicked on a border
+# borderB1 -		Boolean that set whether B1 can be used for the
+#			interactiving resizing
 #--------------------------------------------------------------------------
 ## Interactive cell resizing, affected by -resizeborders option
 ##
@@ -25,7 +28,7 @@ use Carp;
 use strict;
 use vars( '%tkPriv', '$VERSION');
 
-$VERSION = '0.9';
+$VERSION = '1.0';
 
 use Tk qw( Ev );
 
@@ -54,7 +57,7 @@ use Tk::Submethods ( 'border'   => [qw(mark dragto)],
 		     'scan'     => [qw(mark dragto)],
 		     'selection'=> [qw(anchor clear includes set)],
 		     'tag'      => [qw(cell cget col configure delete exists
-				     includes names row)],
+				     includes names row raise lower)],
 		     'window'   => [qw(cget configure delete move names)],
 		     'xview'  => [qw(moveto scroll)],
 		     'yview'  => [qw(moveto scroll)],
@@ -62,10 +65,11 @@ use Tk::Submethods ( 'border'   => [qw(mark dragto)],
 
 
 
-
 sub ClassInit
 {
  my ($class,$mw) = @_;
+
+$tkPriv{borderB1} = 1; # initialize borderB1
 
 $mw->bind($class,'<3>',
   sub
@@ -85,13 +89,7 @@ $mw->bind($class,'<3>',
    {
     my $w = shift;
     my $Ev = $w->XEvent;
-    if ($w->exists)
-     {
-      $w->BeginSelect($w->index('@' . $Ev->x.",".$Ev->y));
-      $w->focus;
-     }
-    $tkPriv{x} = $Ev->x; $tkPriv{y} = $Ev->y;
-    $tkPriv{'mouseMoved'} = 0;
+    $w->Button1($Ev->x,$Ev->y);
    }
  );
  $mw->bind($class,'<B1-Motion>',
@@ -99,18 +97,8 @@ $mw->bind($class,'<3>',
    {
     my $w = shift;
     my $Ev = $w->XEvent;
-    # If we already had motion, or we moved more than 1 pixel,
-    # then we start the Motion routine
-    $tkPriv{'mouseMoved'} = 1 if ($tkPriv{'mouseMoved'} || abs($Ev->x - $tkPriv{x}) > 1 || abs($Ev->y - $tkPriv{y}) > 1);
-    $w->Motion($w->index('@' . $Ev->x.",".$Ev->y)) if ($tkPriv{'mouseMoved'});
-   }
- );
- $mw->bind($class,'<Double-1>',
-  sub
-   {
-    my $w = shift;
-    my $Ev = $w->XEvent;
-    # empty
+    $w->B1Motion($Ev->x,$Ev->y);
+    
    }
  );
  $mw->bind($class,'<ButtonRelease-1>',
@@ -118,6 +106,7 @@ $mw->bind($class,'<3>',
    {
     my $w = shift;
     my $Ev = $w->XEvent;
+    $tkPriv{borderInfo} = "";
     if ($w->exists)
      {
       $w->CancelRepeat;
@@ -149,8 +138,10 @@ $mw->bind($class,'<3>',
    {
     my $w = shift;
     my $Ev = $w->XEvent;
-    $tkPriv{x} = $Ev->x; $tkPriv{y} = $Ev->y;
-    $w->AutoScan;
+    if( !$tkPriv{borderInfo} ){ 
+	    $tkPriv{x} = $Ev->x; $tkPriv{y} = $Ev->y;
+	    $w->AutoScan;
+    }
    }
  );
  $mw->bind($class,'<2>',
@@ -202,9 +193,9 @@ $mw->bind($class,'<3>',
    }
  );
  
- # Remove this if you don't want cell commit to occur on every
-# Leave of the table.  Another possible choice is <FocusOut>.
-$mw->eventAdd( qw[ <<Table_Commit>> <Leave> ]);
+# Remove this if you don't want cell commit to occur on every Leave for
+# the table (via mouse) or FocusOut (loss of focus by table).
+$mw->eventAdd( qw[ <<Table_Commit>> <Leave> <FocusOut> ]);
 
  $mw->bind($class,'<Shift-Up>',['ExtendSelect',-1,0]);
  $mw->bind($class,'<Shift-Down>',['ExtendSelect',1,0]);
@@ -273,15 +264,7 @@ $mw->eventAdd( qw[ <<Table_Commit>> <Leave> ]);
  $mw->bind($class,'<Right>',['MoveCell',0,1]);
  $mw->bind($class,'<KeyPress>',['TableInsert',Ev('A')]);
 
- $mw->bind($class,'<BackSpace>',
-  sub
-   {
-    my $w = shift;
-    my $Ev = $w->XEvent;
-    my $posn = $w->icursor;
-    $w->delete('active',$posn - 1);
-   }
- );
+ $mw->bind($class,'<BackSpace>',['BackSpace']);
 
  $mw->bind($class,'<Delete>',['delete','active','insert']);
  $mw->bind($class,'<Escape>','reread');
@@ -357,6 +340,53 @@ $mw->eventAdd( qw[ <<Table_Commit>> <Leave> ]);
 }
 
 
+
+# ::tk::table::GetSelection --
+#   This tries to obtain the default selection.  On Unix, we first try
+#   and get a UTF8_STRING, a type supported by modern Unix apps for
+#   passing Unicode data safely.  We fall back on the default STRING
+#   type otherwise.  On Windows, only the STRING type is necessary.
+# Arguments:
+#   w	The widget for which the selection will be retrieved.
+#	Important for the -displayof property.
+#   sel	The source of the selection (PRIMARY or CLIPBOARD)
+# Results:
+#   Returns the selection, or an error if none could be found
+#
+sub GetSelection{
+
+	my $w = shift;
+	my $sel = shift;
+	$sel ||= 'PRIMARY';
+	
+	my $txt;
+	if( $Tk::platform eq 'unix'){
+		eval{ $txt = $w->SelectionGet( -selection =>  $sel) };
+
+		if( $@){
+			warn("Could not find default selection\n");
+			return undef;
+		}
+			
+		return $txt;
+
+	}
+	else{
+	
+		eval{ $txt = $w->SelectionGet( -selection => $sel) };
+
+		if( $@){
+			warn("Could not find default selection\n");
+			return undef;
+		}
+
+		return $txt;
+		
+	}
+}
+		
+
+
 # ClipboardKeysyms --
 # This procedure is invoked to identify the keys that correspond to
 # the "copy", "cut", and "paste" functions for the clipboard.
@@ -395,6 +425,111 @@ sub TableInsert
  my $w = shift;
  my $s = shift;
  $w->insert('active','insert',$s) if ($s ne '' ) ;
+}
+# ::tk::table::BackSpace --
+#
+#   BackSpace in the current cell
+#
+# Arguments:
+#   w	- the table widget
+# Results:
+#   Returns nothing
+#
+sub BackSpace{
+	
+    my $w = shift;
+    my $Ev = $w->XEvent;
+    my $posn = $w->icursor;
+    $w->delete('active',$posn - 1) if( $posn > -1);
+}
+
+# Button1 --
+#
+# This procedure is called to handle selecting with mouse button 1.
+# It will distinguish whether to start selection or mark a border.
+#
+# Arguments:
+#   w	- the table widget
+#   x	- x coord
+#   y	- y coord
+# Results:
+#   Returns nothing
+#
+sub Button1 {
+
+	my $w = shift;
+	my ( $x, $y ) = @_;
+
+	# borderInfo is null if the user did not click on a border
+	if ( $tkPriv{borderB1} == 1 ) {
+		$tkPriv{borderInfo} = $w->borderMark( $x, $y );
+	}
+	else {
+		$tkPriv{borderInfo} = "";
+	}
+
+	if ( ! $tkPriv{borderInfo} ) {
+
+		#
+		# Only do this when a border wasn't selected
+		#
+		if ( $w->exists ) {
+			$w->BeginSelect( $w->index( '@' . "$x,$y" ) );
+			$w->focus;
+		}
+		$tkPriv{x}          = $x;
+		$tkPriv{y}          = $y;
+		$tkPriv{mouseMoved} = 0;
+	}
+}
+
+# B1Motion --
+#
+# This procedure is called to start processing mouse motion events while
+# button 1 moves while pressed.  It will distinguish whether to change
+# the selection or move a border.
+#
+# Arguments:
+#   w	- the table widget
+#   x	- x coord
+#   y	- y coord
+# Results:
+#   Returns nothing
+#
+sub B1Motion {
+
+	my $w = shift;
+
+	my ( $x, $y ) = @_;
+
+	# If we already had motion, or we moved more than 1 pixel,
+	# then we start the Motion routine
+
+	if ( $tkPriv{borderInfo}  ) {
+
+		#
+		# If the motion is on a border, drag it and skip the rest
+		# of this binding.
+		#
+		$w->borderDragto( $x, $y );
+
+	}
+	else {
+
+		#
+		# If we already had motion, or we moved more than 1 pixel,
+		# then we start the Motion routine
+		#
+		if ( $tkPriv{mouseMoved}
+		      || abs( $x - $tkPriv{x} ) > 1
+		      || abs( $y - $tkPriv{y} ) > 1 ) {
+
+			$tkPriv{mouseMoved} = 1;
+		}
+		if ( $tkPriv{mouseMoved} ) {
+			$w->Motion( $w->index( '@' . "$x,$y" ) );
+		}
+	}
 }
 # BeginSelect --
 #
@@ -533,6 +668,11 @@ sub Motion
   }
  elsif ($selectmode eq 'extended')
   {
+   # avoid tables that have no anchor index yet.
+   my $indexAnchor;
+   eval{ $indexAnchor = $w->index('anchor') };
+   return if( $@ || !$indexAnchor);
+
    ($r,$c) = split(",",$tkPriv{tablePrev});
    ($elr,$elc) = split(",",$el);
 
@@ -887,7 +1027,7 @@ sub Copy
    $w->clipboardClear;
    eval
     {
-     $w->clipboardAppend($w->SelectionGet);
+     $w->clipboardAppend($w->GetSelection);
     }
    ;
   }
@@ -908,7 +1048,7 @@ sub Cut
    $w->clipboardClear;
    eval
     {
-     $w->clipboardAppend($w->SelectionGet);
+     $w->clipboardAppend($w->GetSelection);
      $w->curselection('');# Clear whatever is selected
      $w->selectionClear();
     }
@@ -930,11 +1070,11 @@ sub Paste
  my $data;
  if ($cell ne '')
   {
-   eval{ $data = $w->SelectionGet(); }; return if($@);
+   eval{ $data = $w->GetSelection(); }; return if($@);
   }
  else
   {
-   eval{ $data = $w->SelectionGet(-selection => 'CLIPBOARD'); }; return if($@);
+   eval{ $data = $w->GetSelection('CLIPBOARD'); }; return if($@);
    $cell = 'active';
   }
  $w->PasteHandler($w->index($cell),$data);
@@ -951,9 +1091,14 @@ sub Paste
 
 sub PasteHandler
 {
+
  my $w = shift;
  my $cell = shift;
  my $data = shift;
+ #
+ # Don't allow pasting into the title cells
+ #
+ return if( $w->tagIncludes('title', $cell));
  my $rows;
  my $cols;
  my $r;

@@ -1,30 +1,138 @@
+2002-12-02 09:44  cerney
+
+	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
+	TableMatrix/SpreadsheetHideRows.pm, pTk/Makefile.PL, README:
+	Preparation for next release.
+
+2002-11-22 08:23  cerney
+
+	* TableMatrix.pm: Completed Changes to TableMatrix.pm for the
+	upgrade to Tktkable 2.8
+
+2002-11-22 08:18  cerney
+
+	* demos/spreadsheet: Modified to work again. (Didn't work because
+	of update to perl5.6???)
+
+2002-11-18 09:59  cerney
+
+	* pod/TableMatrix.pod: Docs updated for changes to TkTable 2.7 to
+	2.8
+
+2002-11-15 16:19  cerney
+
+	* pTk/mTk/Tktable/: tkTable.h, tkTableTag.c, tkTableWin.c: Compiles
+	with warnings on solaris.
+
+2002-11-15 15:19  cerney
+
+	* pTk/mTk/Tktable/: tkTable.c, tkTable.h, tkTableCell.c,
+	tkTableCellSort.c, tkTableCmds.c, tkTableEdit.c,
+	tkTableInitScript.h, tkTableTag.c, tkTableUtil.c, tkTableWin.c,
+	version.h: Merged Changed from Stock version 2.7 to 2.8. Conflicts
+	resolved, Not Tested Yet.
+
+2002-11-08 11:52  cerney
+
+	* pTk/mTk/Tktable/: tkTable.c, tkTable.h, tkTableCell.c,
+	tkTableCellSort.c, tkTableCmds.c, tkTableEdit.c,
+	tkTableInitScript.h, tkTableTag.c, tkTableUtil.c, tkTableWin.c,
+	version.h: tkTable2.8 Source update
+
+2002-11-01 15:38  cerney
+
+	* pTk/mTk/Tktable/: tkTable.c, tkTableTag.c: Mods to compile and
+	run on linux.
+
+2002-11-01 14:42  cerney
+
+	* TableMatrix.pm, demos/tagBorderWidth, demos/tagMerge2,
+	pTk/mTk/Tktable/tkTable.h, pTk/mTk/Tktable/tkTableTag.c,
+	pTk/mTk/Tktable/tkTableversion.h: Updates for changes in the
+	Version 2.7 tktable now fully functional on unix. Not tested on
+	win32 yet.
+
+2002-11-01 13:34  cerney
+
+	* TableMatrix.pm: Updated for changes in the Version 2.7
+	tktable.tcl file
+
+2002-11-01 12:58  cerney
+
+	* pod/TableMatrix.pod: Updated for the doc changes from tktable 2.6
+	to 2.7
+
+2002-11-01 10:48  cerney
+
+	* pTk/mTk/Tktable/tkTable.c: Version 2.7 merges now are functional.
+
+2002-11-01 10:08  cerney
+
+	* pTk/mTk/Tktable/: pTk.exc, tkTable.c, tkTable.h, tkTableCell.c,
+	tkTableCmds.c, tkTableTag.c, tkTableUtil.c: Now Compiles
+	successfully with tktable2.8 changes, but core dumps when running.
+
+2002-10-30 11:06  cerney
+
+	* pTk/mTk/Tktable/cmd.c: Removed. Not Include in tktable 2.7
+	anymore.
+
+2002-10-30 09:50  cerney
+
+	* pTk/mTk/Tktable/: mac_tkTable.r, mac_tkTable_prefix.h, tkTable.c,
+	tkTable.h, tkTableCell.c, tkTableCmds.c, tkTableEdit.c,
+	tkTableTag.c, tkTableUtil.c, tkTableWin.c, version.h: Stock tktable
+	changes from 2.6 to 2.7 merged with main branch. Conflicts
+	Resolved. Compilation not tested yet.
+
+2002-10-29 15:52  cerney
+
+	* pTk/mTk/Tktable/version.h: file version.h was initially added on
+	branch stock-tktable.
+
+2002-10-29 15:52  cerney
+
+	* pTk/mTk/Tktable/tkTableUtil.c: file tkTableUtil.c was initially
+	added on branch stock-tktable.
+
+2002-10-29 15:52  cerney
+
+	* pTk/mTk/Tktable/: mac_tkTable.r, mac_tkTable_prefix.h, tkTable.c,
+	tkTable.h, tkTableCell.c, tkTableCmds.c, tkTableEdit.c,
+	tkTableTag.c, tkTableUtil.c, tkTableWin.c, version.h: tktable2.7
+	Source update
+
+2002-09-25 07:08  cerney
+
+	* COPYING: Updated to be match reality.
+
 2002-05-22 15:53  cerney
 
 	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
 	TableMatrix/SpreadsheetHideRows.pm, pTk/Makefile.PL: Preparation
-        for next release
+	for next release
 
 2002-04-11 15:17  cerney
 
 	* demos/tagMerge, pTk/mTk/Tktable/tkTableTag.c: Mods to make tag
 	merging work correctly when an option is also set in the option
-        database. Also added test case tagMerge.
+	database. Also added test case tagMerge.
 
 2002-04-09 12:07  cerney
 
 	* pod/TableMatrix.pod: Added some clarification on how tags are
-        merged
+	merged
 
 2002-03-18 11:01  cerney
 
 	* t/create.t: Updated to include the new SpreadsheetHideRows
-        widget.
+	widget.
 
 2002-03-18 11:00  cerney
 
 	* TableMatrix/SpreadsheetHideRows.pm, demos/SpreadsheetHideRows:
 	Added new derived SpreadsheetHideRows widget. This enables display
-        of tabular info, with selectable hide/unhide of detail data.
+	of tabular info, with selectable hide/unhide of detail data.
 
 2002-02-28 08:23  cerney
 
@@ -32,12 +140,12 @@
 	Tcl_ArgResult Call from the code, since its use now gets a warning
 	message under Tk800.023. Had to create a TableCellSortObj routine
 	(equivalent to the existing TableCellSort routine) to accomodate
-        this change.
+	this change.
 
 2002-02-13 07:00  cerney
 
 	* TableMatrix.pm: Fixed bug where selecting multiple times in title
-        area created an error. (Submitted by Christian Becker)
+	area created an error. (Submitted by Christian Becker)
 
 2002-01-10 08:23  cerney
 
@@ -45,40 +153,40 @@
 	inserting rows when tablecmd is active. Previously, the 'value' arg
 	would get lost when being passed to the callback (garbace
 	collection problem). Changing the call from char* to Arg appears to
-        fix the problem.
+	fix the problem.
 
 2001-10-04 07:00  cerney
 
 	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
-        pTk/Makefile.PL: Preparation for the next release.
+	pTk/Makefile.PL: Preparation for the next release.
 
 2001-10-02 12:55  cerney
 
 	* TableMatrix.pm: Fixed bug where dragging the cursor outside of
 	the window (when selecting some cells) would cause the selection to
-        go nuts.
+	go nuts.
 
 2001-07-09 14:59  cerney
 
 	* pTk/mTk/Tktable/tkTable.c: Modified to redraw the entire window
 	when on a expose event. The widget didn't not appear to
 	update/refresh properly when updating what it thought was the
-        invalid rectangle.
+	invalid rectangle.
 
 2001-06-15 15:19  cerney
 
 	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
-        pTk/Makefile.PL: Makeready for release 0.71
+	pTk/Makefile.PL: Makeready for release 0.71
 
 2001-06-15 15:04  cerney
 
 	* Makefile.PL, pTk/Makefile.PL, pTk/mTk/Tktable/tkTable.c: Fixed to
-        compile with Tk800.022 and Tk800.023
+	compile with Tk800.022 and Tk800.023
 
 2001-06-12 18:11  cerney
 
 	* pTk/mTk/Tktable/: tkTable.c, tkTablePs.c: Updated to work with
-        Tk800.023
+	Tk800.023
 
 2001-06-06 15:57  cerney
 
@@ -87,12 +195,12 @@
 2001-06-06 15:56  cerney
 
 	* TableMatrix/Spreadsheet.pm: Added version to Spreadsheet.pm in
-        preparation for release.
+	preparation for release.
 
 2001-06-06 11:58  cerney
 
 	* TableMatrix.pm, Makefile.PL: Updated version in preparation for
-        release.
+	release.
 
 2001-06-06 11:43  cerney
 
@@ -102,25 +210,25 @@
 	cell sorting method didn't sort negative row/column indexes
 	correctly, which caused the data from a copy/paste operation to be
 	out-of-order, if the selection included multiple negative row/col
-        indexes.
+	indexes.
 
 2001-06-05 12:12  cerney
 
 	* TableMatrix/Spreadsheet.pm, demos/TableMatrixSpreadsheetTest,
 	t/create.t: Added TableMatrix::Spreadsheet. TableMatrix Derived
-        object with excel-like bindings
+	object with excel-like bindings
 
 2001-06-01 06:43  cerney
 
 	* TableMatrix.pm: Applied Slaven's patch to fix the control-+/-
-        bindings for modifying the column width.
+	bindings for modifying the column width.
 
 2000-12-24 13:01  cerney
 
 	* pTk/: Makefile.PL, mTk/Tktable/tkTable.c: Fixed Version in
 	pTk/Makefile.PL Removed the hard-coded forceupdate=1 in tkTable.c
 	to reduce the flashing seen when updating the cursor. This may have
-        other side effects... needs to be watched.
+	other side effects... needs to be watched.
 
 2000-12-20 07:38  cerney
 
@@ -143,22 +251,23 @@
 	* pTk/mTk/Tktable/tkTable.c: Modified to keep the selection around
 	for incremental selection gets. This helps speed up getting the
 	selection, esp for large area selects.
+	
 	Added setting the cursor to 'watch' when getting the selection. For
 	large selection areas this can take some time, so setting the
 	cursor to watch will at least notify the user that something is
-        happening.
+	happening.
 
 2000-10-26 16:14  cerney
 
 	* pTk/mTk/Tktable/tkTableCellSort.c: Fixed the sorting routine to
-        work with perl/tk
+	work with perl/tk
 
 2000-10-26 11:41  cerney
 
 	* pTk/mTk/Tktable/: tkTable.h, tkTableCellSort.c: Changed from
 	tktable 2.6 are now incorporated and are fully functional! This
 	looked like a very complicated job, but CVS branch management
-        features made it easy.
+	features made it easy.
 
 2000-10-26 09:49  cerney
 
@@ -166,19 +275,19 @@
 	tkTableCellSort.c, tkTableCmds.c, tkTableEdit.c,
 	tkTableInitScript.h, tkTableTag.c, tkTableWin.c, tkTableversion.h:
 	Merged Changes from tcl/tk's tktable2.5 to tktable2.6 from the
-        stock-tktable branch.  Resolved conflicts.  Not functional yet.
+	stock-tktable branch.  Resolved conflicts.  Not functional yet.
 
 2000-10-26 07:48  cerney
 
 	* pTk/mTk/Tktable/tkTableCellSort.c: file tkTableCellSort.c was
-        initially added on branch stock-tktable.
+	initially added on branch stock-tktable.
 
 2000-10-26 07:48  cerney
 
 	* pTk/mTk/Tktable/: tkTable.c, tkTable.h, tkTableCell.c,
 	tkTableCellSort.c, tkTableCmds.c, tkTableEdit.c,
 	tkTableInitScript.h, tkTableTag.c, tkTableWin.c, tkTableversion.h:
-        tktable2.6 Source update
+	tktable2.6 Source update
 
 2000-09-16 15:29  cerney
 
@@ -195,36 +304,36 @@
 2000-08-23 16:39  cerney
 
 	* pod/: TableMatrix.pod, tkTable.pod: Changes to make the name
-        TableMatrix
+	TableMatrix
 
 2000-08-23 16:36  cerney
 
 	* demos/: TableMatrixTest, basic, buttons, command, debug,
 	dynarows, maxsize, spreadsheet, tktableTest: Changes for the new
-        name 'TableMatrix'
+	name 'TableMatrix'
 
 2000-08-23 16:27  cerney
 
 	* Makefile.PL, README, TableMatrix.pm, TableMatrix.xs,
 	demos/tktableTest: Initial Changes for moving name from tktable to
-        TableMatrix
+	TableMatrix
 
 2000-08-20 20:44  cerney
 
 	* pTk/mTk/Tktable/tkTablePs.c: Fixed Compile warnings in
-        tkTablePs.c
+	tkTablePs.c
 
 2000-08-19 11:19  cerney
 
-	* README, pTk/mTk/Tktable/tkTablePs.c, t/create.t: Updated Readme.
-        Added Test file in 't' directory.
+	* README, pTk/mTk/Tktable/tkTablePs.c, t/create.t: Updated Readme. 
+	Added Test file in 't' directory.
 
 2000-08-17 21:16  cerney
 
 	* README, TableMatrix.xs, pTk/mTk/Tktable/tkTable.h,
 	pTk/mTk/Tktable/tkTableCell.c, pTk/mTk/Tktable/tkTablePs.c: Added
 	own routine to unset variable in the array hash (TCL_Unsetvar2
-        function)
+	function)
 
 2000-08-17 09:18  cerney
 
@@ -239,7 +348,7 @@
 	* Makefile.PL, pTk/mTk/Tktable/tkTable.c,
 	pTk/mTk/Tktable/tkTableCell.c, pTk/mTk/Tktable/tkTableTag.c,
 	pTk/mTk/Tktable/tkTableWin.c: Incorporated Changes made while
-        compiling under Win98 mingw32.
+	compiling under Win98 mingw32.
 
 2000-07-25 15:48  cerney
 
@@ -257,7 +366,7 @@
 
 	* demos/basic, demos/command, demos/dynarows, demos/tktableTest,
 	pTk/mTk/Tktable/tkTableCmds.c, pTk/mTk/Tktable/tkTableTag.c,
-        pod/tkTable.pod: Got dynarows demo working
+	pod/tkTable.pod: Got dynarows demo working
 
 2000-07-22 21:28  cerney
 
@@ -280,22 +389,22 @@
 	* demos/command, pTk/mTk/Tktable/perlPort.pod,
 	pTk/mTk/Tktable/tkTable.c, pTk/mTk/Tktable/tkTableCell.c,
 	pTk/mTk/Tktable/tkTableCmds.c, pod/tkTable.pod: Got the command
-        demo working.
+	demo working.
 
 2000-07-20 21:28  cerney
 
 	* demos/buttons: Changed Leave event to Focus out event. Leave
-        caused the buttons to not work on Linux.
+	caused the buttons to not work on Linux.
 
 2000-07-20 14:11  cerney
 
 	* demos/basic, demos/buttons, pTk/mTk/Tktable/tkTableCell.c,
-        pTk/mTk/Tktable/tkTableCmds.c: Got buttons demo working.
+	pTk/mTk/Tktable/tkTableCmds.c: Got buttons demo working.
 
 2000-07-19 21:25  cerney
 
 	* pTk/mTk/Tktable/: perlPort.pod, tkTableTag.c: Modified so the Tag
-        calbacks would work.
+	calbacks would work.
 
 2000-07-19 16:41  cerney
 
@@ -306,13 +415,13 @@
 	* TableMatrix.pm, demos/basic, pTk/mTk/Tktable/tkTable.c,
 	pTk/mTk/Tktable/tkTable.h, pTk/mTk/Tktable/tkTableCmds.c,
 	pod/tkTable.pod: * Started Adding the converted tcl demos * Changed
-        the width and heigth methods to colWidth and rowHeight
+	the width and heigth methods to colWidth and rowHeight
 
 2000-07-05 07:18  cerney
 
 	* pTk/mTk/Tktable/tkTableTag.c: Changed Tcl_NewBooleanObj to
 	Tcl_NewIntObj. Tcl_NewBooleanObj didn't appear to be defined in the
-        Lang.h interface.
+	Lang.h interface.
 
 2000-07-05 07:17  cerney
 
@@ -325,34 +434,34 @@
 2000-07-02 20:15  cerney
 
 	* Makefile.PL, pTk/mTk/Tktable/tkTable.h: Changed version.h to
-        tktableversion.h
+	tktableversion.h
 
 2000-07-02 19:32  cerney
 
 	* Makefile.PL, myConfig, pTk/Makefile.PL: Successfull compilation
-        after removing unnecesaary files.
+	after removing unnecesaary files.
 
 2000-07-02 10:59  cerney
 
 	* TableMatrix.pm, TableMatrix.xs, pTk/mTk/Tktable/tkTable.c: Fixed
-        Problem with autoscanning.
+	Problem with autoscanning.
 
 2000-07-01 22:57  cerney
 
 	* Makefile.PL, TableMatrix.pm, TableMatrix.xs, tkGlue.h,
 	pTk/Makefile.PL, pTk/mTk/Tktable/tkTable.c, pod/Makefile.PL:
 	Initial Success at compilation and demo run after splitting-off
-        from Tk
+	from Tk
 
 2000-06-30 16:33  cerney
 
 	* Makefile.PL, myConfig: Added necessary Files. Minor Mods to try
-        to compile separate from Tk
+	to compile separate from Tk
 
 2000-06-30 15:34  cerney
 
 	* TableMatrix.pm, pTk/mTk/Tktable/tkTable.c: All Bindings appear to
-        work. Check before splitting off into separate module
+	work. Check before splitting off into separate module
 
 2000-06-30 14:04  cerney
 
@@ -361,14 +470,14 @@
 2000-06-29 21:48  cerney
 
 	* pTk/mTk/Tktable/tkTable.c, TableMatrix.pm: Removed referencing to
-        XSetClipRectangles
+	XSetClipRectangles
 
 2000-06-29 16:32  cerney
 
 	* pTk/mTk/Tktable/perlPort.pod, pTk/mTk/Tktable/tkTable.c,
 	pTk/mTk/Tktable/tkTable.h, pTk/mTk/Tktable/tkTableCell.c,
 	pTk/mTk/Tktable/tkTableCmds.c, TableMatrix.pm: Now Functional, Some
-        Bugs
+	Bugs
 
 2000-06-28 21:30  cerney
 
@@ -379,17 +488,17 @@
 	* pTk/mTk/Tktable/perlPort.pod, pTk/mTk/Tktable/tkTable.c,
 	pTk/mTk/Tktable/tkTableCell.c, pTk/mTk/Tktable/tkTablePs.c,
 	pTk/mTk/Tktable/tkTableTag.c, TableMatrix.pm: Now Displays Table
-        but some segfaults
+	but some segfaults
 
 2000-06-28 13:19  cerney
 
 	* pTk/mTk/Tktable/: perlPort.pod, tkTable.c: Mods to Tk_TableObjCmd
-        to be compatible with perltk
+	to be compatible with perltk
 
 2000-06-28 06:52  cerney
 
 	* TableMatrix.pm, TableMatrix.xs: Minor change to all lower case
-        for the Tk_cmd
+	for the Tk_cmd
 
 2000-06-27 21:24  cerney
 
@@ -403,13 +512,13 @@
 
 	* pTk/mTk/Tktable/tkTable.c, pTk/mTk/Tktable/tkTable.h,
 	TableMatrix.pm, TableMatrix.xs: Intermediate check-in while trying
-        to get tkTable.so to autoload
+	to get tkTable.so to autoload
 
 2000-06-27 09:11  cerney
 
 	* myConfig, pTk/mTk/Tktable/tkTableTag.c, TableMatrix.pm,
 	TableMatrix.xs: Added tkTable.pm and associated files (translated
-        from tkTable.tcl) Minor mods for compilation.
+	from tkTable.tcl) Minor mods for compilation.
 
 2000-06-23 17:43  cerney
 
@@ -417,23 +526,23 @@
 	pTk/mTk/Tktable/tkTable.h, pTk/mTk/Tktable/tkTableCell.c,
 	pTk/mTk/Tktable/tkTableCmds.c, pTk/mTk/Tktable/tkTablePs.c,
 	pTk/mTk/Tktable/tkTableTag.c, pTk/mTk/Tktable/tkTableWin.c: 1st
-        sucessfull compile.
+	sucessfull compile.
 
 2000-06-22 21:43  cerney
 
 	* pTk/mTk/Tktable/: perlPort.pod, tkTable.c, tkTable.h: Almost got
-        tktable.c to compile.
+	tktable.c to compile.
 
 2000-06-22 16:34  cerney
 
 	* pTk/mTk/Tktable/: cmd.c, mm.h, perlPort.pod, tkTable.c,
 	tkTable.h: Daily Snapshot of work. Currently working to sort out
-        the calling of expandpercents in tktable.c
+	the calling of expandpercents in tktable.c
 
 2000-06-21 21:40  cerney
 
 	* pTk/mTk/Tktable/: cmd.c, mm.h, tkTable.c: Started modifying char*
-        to Args in cmd structure routines.
+	to Args in cmd structure routines.
 
 2000-06-21 16:35  cerney
 
@@ -442,7 +551,7 @@
 	mTk/Tktable/tkTableCell.c, mTk/Tktable/tkTableCmds.c,
 	mTk/Tktable/tkTableEdit.c, mTk/Tktable/tkTablePs.c,
 	mTk/Tktable/tkTableTag.c, mTk/Tktable/tkTableWin.c: Initial Try at
-        getting tktable to compile
+	getting tktable to compile
 
 2000-06-21 07:36  cerney
 
@@ -456,7 +565,7 @@
 	perlPort.pod, tkAppInit.c, tkTable.c, tkTable.h, tkTableCell.c,
 	tkTableCmds.c, tkTableEdit.c, tkTableInitScript.h, tkTablePs.c,
 	tkTableTag.c, tkTableWin.c, tkTableversion.h: Stock Tktable source
-        upload
+	upload
 
 2000-06-20 18:55  cerney
 
@@ -466,7 +575,7 @@
 	pTk/from, pTk/genexc, pTk/license.html_lib, pTk/license.terms,
 	pTk/makeenglish, pTk/mkXinfo, pTk/mkmethods, pTk/mkneed, pTk/p4e,
 	pTk/process_object, pTk/refs, pTk/tdiff, pTk/why, pTk/mTk/README,
-        pTk/mTk/license.terms: Initial revision
+	pTk/mTk/license.terms: Initial revision
 
 2000-06-20 18:55  cerney
 
@@ -476,5 +585,5 @@
 	pTk/from, pTk/genexc, pTk/license.html_lib, pTk/license.terms,
 	pTk/makeenglish, pTk/mkXinfo, pTk/mkmethods, pTk/mkneed, pTk/p4e,
 	pTk/process_object, pTk/refs, pTk/tdiff, pTk/why, pTk/mTk/README,
-        pTk/mTk/license.terms: Tk Stock 800.022
+	pTk/mTk/license.terms: Tk Stock 800.022
 

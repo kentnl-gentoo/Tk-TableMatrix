@@ -2,6 +2,28 @@ Summary of Changes to Tk::TableMatrix
 
 See ChangeLog for detailed changes.
 
+Release 1.0:  12/2/02
+
+* Updated core C-code for the changes made from TkTable 2.6 to 2.8.
+  (Tk::TableMatrix is derived from the TkTable Tcl/Tk Widget.
+    See tktable.sourceforge.net ) 
+    
+  From the TkTable 2.7 and 2.8 Release Notes:
+  
+    * Corrected memory leaks in caching.
+    * Added the ability to select borders with Button1.
+    * Added global -justify option.
+  
+    * Added -ipadx/-ipady table options and swapped them with
+      the old -padx/-pady.  This gives better control over the
+      cell padding. **** POTENTIAL INCOMPATABILITY ****
+    * -borderwidth now takes up to 4 values to allow you to
+      customize edge edge of a cell.
+    * Added priorities to tags, so tags can be raised and
+      lowered in priority. **** POTENTIAL INCOMPATABILITY ****  
+      
+* Numerous minor bugs fixed.
+
 Release 0.9:  5/22/02
 
 * Added an experimental widget: SpreadsheetHideRows. This enables

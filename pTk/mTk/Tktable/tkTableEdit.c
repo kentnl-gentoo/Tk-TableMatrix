@@ -3,11 +3,12 @@
  *
  *	This module implements editing functions of a table widget.
  *
- * Copyright (c) 1998 Jeffrey Hobbs
+ * Copyright (c) 1998-2000 Jeffrey Hobbs
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
+ * RCS: @(#) $Id: tkTableEdit.c,v 1.5 2002/11/15 21:19:43 cerney Exp $
  */
 
 #include "tkVMacro.h"
@@ -20,7 +21,7 @@ static void	TableModifyRC _ANSI_ARGS_((register Table *tablePtr,
 			int outOfBounds));
 
 /* insert/delete subcommands */
-static char *modCmdNames[] = {
+static CONST84 char *modCmdNames[] = {
     "active", "cols", "rows", (char *)NULL
 };
 enum modCmd {
@@ -28,7 +29,7 @@ enum modCmd {
 };
 
 /* insert/delete row/col switches */
-static char *rcCmdNames[] = {
+static CONST84 char *rcCmdNames[] = {
     "-keeptitles",	"-holddimensions",	"-holdselection",
     "-holdtags",	"-holdwindows",	"--",
     (char *) NULL
@@ -191,8 +192,8 @@ Table_EditCmd(ClientData clientData, register Tcl_Interp *interp,
 	    tagTblPtr	= tablePtr->rowStyles;
 	    dimTblPtr	= tablePtr->rowHeights;
 	    dimPtr	= &(tablePtr->rows);
-	    lo		= tablePtr->colOffset+((flags & HOLD_TITLES) ?
-					       tablePtr->titleCols : 0);
+	    lo		= tablePtr->colOffset
+		+ ((flags & HOLD_TITLES) ? tablePtr->titleCols : 0);
 	    hi		= maxcol;
 	} else {
 	    maxkey	= maxcol;
@@ -202,8 +203,8 @@ Table_EditCmd(ClientData clientData, register Tcl_Interp *interp,
 	    tagTblPtr	= tablePtr->colStyles;
 	    dimTblPtr	= tablePtr->colWidths;
 	    dimPtr	= &(tablePtr->cols);
-	    lo		= tablePtr->rowOffset+((flags & HOLD_TITLES) ?
-					       tablePtr->titleRows : 0);
+	    lo		= tablePtr->rowOffset
+		+ ((flags & HOLD_TITLES) ? tablePtr->titleRows : 0);
 	    hi		= maxrow;
 	}
 
@@ -232,10 +233,39 @@ Table_EditCmd(ClientData clientData, register Tcl_Interp *interp,
 		maxkey += count;
 		*dimPtr += count;
 	    }
+	    /*
+	     * We need to call TableAdjustParams before TableModifyRC to
+	     * ensure that side effect code like var traces that might get
+	     * called will access the correct new dimensions.
+	     */
+	    if (*dimPtr < 1) {
+		*dimPtr = 1;
+	    }
+	    TableAdjustParams(tablePtr);
 	    for (i = maxkey; i >= first; i--) {
 		/* move row/col style && width/height here */
 		TableModifyRC(tablePtr, doRows, flags, tagTblPtr, dimTblPtr,
 			offset, i, i-count, lo, hi, ((i-count) < first));
+	    }
+	    if (!(flags & HOLD_WINS)) {
+		/*
+		 * This may be a little severe, but it does unmap the
+		 * windows that need to be unmapped, and those that should
+		 * stay do remap correctly. [Bug #551325]
+		 */
+		if (doRows) {
+		    EmbWinUnmap(tablePtr,
+			    first - tablePtr->rowOffset,
+			    maxkey - tablePtr->rowOffset,
+			    lo - tablePtr->colOffset,
+			    hi - tablePtr->colOffset);
+		} else {
+		    EmbWinUnmap(tablePtr,
+			    lo - tablePtr->rowOffset,
+			    hi - tablePtr->rowOffset,
+			    first - tablePtr->colOffset,
+			    maxkey - tablePtr->colOffset);
+		}
 	    }
 	} else {
 	    /* (index = i && count = 1) == (index = i && count = -1) */
@@ -243,7 +273,16 @@ Table_EditCmd(ClientData clientData, register Tcl_Interp *interp,
 		/* if the count is negative, make sure that the col count will
 		 * delete no greater than the original index */
 		if (first+count < minkey) {
-		    count += first-minkey;
+		    if (first-minkey < abs(count)) {
+			/*
+			 * In this case, the user is asking to delete more rows
+			 * than exist before the minkey, so we have to shrink
+			 * the count down to the existing rows up to index.
+			 */
+			count = first-minkey;
+		    } else {
+			count += first-minkey;
+		    }
 		    first = minkey;
 		} else {
 		    first += count;
@@ -263,6 +302,15 @@ Table_EditCmd(ClientData clientData, register Tcl_Interp *interp,
 	    if (!(flags & HOLD_DIMS)) {
 		*dimPtr -= count;
 	    }
+	    /*
+	     * We need to call TableAdjustParams before TableModifyRC to
+	     * ensure that side effect code like var traces that might get
+	     * called will access the correct new dimensions.
+	     */
+	    if (*dimPtr < 1) {
+		*dimPtr = 1;
+	    }
+	    TableAdjustParams(tablePtr);
 	    for (i = first; i <= maxkey; i++) {
 		TableModifyRC(tablePtr, doRows, flags, tagTblPtr, dimTblPtr,
 			offset, i, i+count, lo, hi, ((i+count) > maxkey));
@@ -275,7 +323,15 @@ Table_EditCmd(ClientData clientData, register Tcl_Interp *interp,
 	    Tcl_InitHashTable(tablePtr->selCells, TCL_STRING_KEYS);
 	}
 
-	TableAdjustParams(tablePtr);
+	/*
+	 * Make sure that the modified dimension is actually legal
+	 * after removing all that stuff.
+	 */
+	if (*dimPtr < 1) {
+	    *dimPtr = 1;
+	    TableAdjustParams(tablePtr);
+	}
+
 	/* change the geometry */
 	TableGeometryRequest(tablePtr);
 	/* FIX:
@@ -578,13 +634,13 @@ TableModifyRC(tablePtr, doRows, flags, tagTblPtr, dimTblPtr,
 	if (doRows /* rows */) {
 	    TableMakeArrayIndex(from, j, buf);
 	    TableMakeArrayIndex(to, j, buf1);
-	    TableSetCellValue(tablePtr, from, j, outOfBounds ? "" :
-		    TableGetCellValue(tablePtr, to, j));
+	    TableMoveCellValue(tablePtr, to, j, buf1, from, j, buf,
+		    outOfBounds);
 	} else {
 	    TableMakeArrayIndex(j, from, buf);
 	    TableMakeArrayIndex(j, to, buf1);
-	    TableSetCellValue(tablePtr, j, from, outOfBounds ? "" :
-		    TableGetCellValue(tablePtr, j, to));
+	    TableMoveCellValue(tablePtr, j, to, buf1, j, from, buf,
+		    outOfBounds);
 	}
 	/*
 	 * If -holdselection is specified, we leave the selected cells in the

@@ -2,3 +2,4 @@ tkAppInit.c
 tkTableInitScript.h
 confdefs.h
 mac_tkTable_prefix.h
+tkTablePs.c
