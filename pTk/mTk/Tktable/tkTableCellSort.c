@@ -107,3 +107,39 @@ TableCellSort(Table *tablePtr, char *str)
     result = Tcl_NewListObj(listArgc, listArgv);
     return result;
 }
+
+/*
+ *----------------------------------------------------------------------
+ *
+ * TableCellSortObj --
+ *	Sorts a list of table cell elements (of form row,col) in place
+ *
+ * Results:
+ *	Sorts list of elements in place.
+ *
+ * Side effects:
+ *	Behaviour undefined for ill-formed input list of elements.
+ *
+ *----------------------------------------------------------------------
+ */
+Tcl_Obj *
+TableCellSortObj(Tcl_Interp *interp, Tcl_Obj *listObjPtr)
+{
+    int length, i;
+    Tcl_Obj* result;
+    Tcl_Obj *sortedObjPtr, **listObjPtrs;
+
+    if (Tcl_ListObjGetElements(interp, listObjPtr,
+			       &length, &listObjPtrs) != TCL_OK) {
+	return NULL;
+    }
+    if (length <= 0) {
+	return listObjPtr;
+    }
+    qsort((VOID *) listObjPtrs, (size_t) length, sizeof (char *),
+	  TableSortCompareProc);
+	  
+    result = Tcl_NewListObj(length, listObjPtrs);
+    return result;
+
+}

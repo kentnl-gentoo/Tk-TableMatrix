@@ -18,6 +18,7 @@ BEGIN
 	qw(
 		TableMatrix
 		TableMatrix::Spreadsheet
+		TableMatrix::SpreadsheetHideRows
 		
 	)
    );

@@ -531,7 +531,7 @@ TableSetCellValue(Table *tablePtr, int r, int c, char *value)
 	return TCL_OK;
     }
     if (tablePtr->command && tablePtr->useCmd) {
-	if (LangDoCallback(interp, tablePtr->command, 1, 4, "%d %d %d %s",1,r,c, value) == TCL_ERROR) {
+	if (LangDoCallback(interp, tablePtr->command, 1, 4, "%d %d %d %_",1,r,c, LangStringArg(value)) == TCL_ERROR) {
 	    /* An error resulted.  Prevent further triggering of the command
 	     * and set up the error message. */
 	    tablePtr->useCmd = 0;

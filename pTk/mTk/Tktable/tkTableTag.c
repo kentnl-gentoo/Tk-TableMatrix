@@ -661,7 +661,7 @@ Table_TagCmd(ClientData clientData, register Tcl_Interp *interp,
 
 	    /* configure the tag structure */
 	    result = Tk_ConfigureWidget(interp, tablePtr->tkwin, tagConfig,
-					objc-4, args+4, (char *) tagPtr, 0);
+					objc-4, args+4, (char *) tagPtr, TK_CONFIG_ARGV_ONLY);
 	} else {
 	    /* pointer wasn't null, do a reconfig if we have enough args */
 	    /* get the tag pointer from the table */

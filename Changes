@@ -2,6 +2,14 @@ Summary of Changes to Tk::TableMatrix
 
 See ChangeLog for detailed changes.
 
+Release 0.9:  5/22/02
+
+* Added an experimental widget: SpreadsheetHideRows. This enables
+  display of tabular info, with selectable hide/unhide of detail
+  data. See demos/SpreadsheetHideRows
+  
+* Numerous minor bugs fixed.
+  
 Release 0.8:  10/5/01
 
 * Removed un-needed dependencies on Data::Parse and Date::Format

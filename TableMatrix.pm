@@ -25,7 +25,7 @@ use Carp;
 use strict;
 use vars( '%tkPriv', '$VERSION');
 
-$VERSION = '0.8';
+$VERSION = '0.9';
 
 use Tk qw( Ev );
 
@@ -630,7 +630,6 @@ sub BeginToggle
       {
        ## We're in a row header
        $end = "$r,".$w->index('end','row');
-       $end = $r;
       }
     }
    else

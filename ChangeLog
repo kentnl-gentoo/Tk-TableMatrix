@@ -1,3 +1,52 @@
+2002-05-22 15:53  cerney
+
+	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
+	TableMatrix/SpreadsheetHideRows.pm, pTk/Makefile.PL: Preparation
+        for next release
+
+2002-04-11 15:17  cerney
+
+	* demos/tagMerge, pTk/mTk/Tktable/tkTableTag.c: Mods to make tag
+	merging work correctly when an option is also set in the option
+        database. Also added test case tagMerge.
+
+2002-04-09 12:07  cerney
+
+	* pod/TableMatrix.pod: Added some clarification on how tags are
+        merged
+
+2002-03-18 11:01  cerney
+
+	* t/create.t: Updated to include the new SpreadsheetHideRows
+        widget.
+
+2002-03-18 11:00  cerney
+
+	* TableMatrix/SpreadsheetHideRows.pm, demos/SpreadsheetHideRows:
+	Added new derived SpreadsheetHideRows widget. This enables display
+        of tabular info, with selectable hide/unhide of detail data.
+
+2002-02-28 08:23  cerney
+
+	* pTk/mTk/Tktable/: tkTableCellSort.c, tkTableCmds.c: Removed
+	Tcl_ArgResult Call from the code, since its use now gets a warning
+	message under Tk800.023. Had to create a TableCellSortObj routine
+	(equivalent to the existing TableCellSort routine) to accomodate
+        this change.
+
+2002-02-13 07:00  cerney
+
+	* TableMatrix.pm: Fixed bug where selecting multiple times in title
+        area created an error. (Submitted by Christian Becker)
+
+2002-01-10 08:23  cerney
+
+	* pTk/mTk/Tktable/tkTableCell.c: Updated to fix problem seen with
+	inserting rows when tablecmd is active. Previously, the 'value' arg
+	would get lost when being passed to the callback (garbace
+	collection problem). Changing the call from char* to Arg appears to
+        fix the problem.
+
 2001-10-04 07:00  cerney
 
 	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,

@@ -729,7 +729,7 @@ its properties are determined by the tags which are assigned to it.  Including
 the special tags, this order is B<flash >, B<active >, B<sel >, B<title >, B<celltag 
 >, B<rowtag >, B<coltag >, default.
 
-If a cell has several tags associated with 
+If a cell has several tags types associated with 
 it, and if their display options conflict, then the options of the highest 
 priority tag are used.  If a particular display option hasn't been specified 
 for a particular tag, or if it is specified as an empty string, then that 
@@ -741,6 +741,11 @@ Images are used for display purposes
 only.  Editing in that cell will still be enabled and any querying of the 
 cell will show the text value of the cell, regardless of the value of 
 B<-showtext >.  
+
+Note: There can be only one tag for a given tag type. ( Tag types = B<flash >, B<active >, B<sel >, B<title >, 
+B<celltag> B<rowtag >, B<coltag >.) For example, you can't apply two cell tags to a single cell (or two row tags to a
+single row, etc) and expect the tag's properties to be merged. The last tag-type applied will be the one that
+is used. 
 
 
 =head1 Embedded Windows 
