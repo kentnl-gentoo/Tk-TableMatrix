@@ -94,7 +94,7 @@ use Date::Format;
 
 use base qw/ Tk::Derived Tk::TableMatrix/;
 
-$VERSION = '0.7';
+$VERSION = '0.71';
 
 
 Tk::Widget->Construct("Spreadsheet");

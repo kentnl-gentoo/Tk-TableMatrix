@@ -936,7 +936,7 @@ Table_PostscriptCmd(clientData, interp, objc, objv)
    */
 
 cleanup:
-    ckfree((char *) argv);
+    ckfree((char *) args);
     Tcl_DStringResult(interp, &postscript);
     Tcl_DStringFree(&postscript);
     Tcl_DStringFree(&buffer);
@@ -1104,7 +1104,8 @@ Tk_TablePsFont(interp, tablePtr, tkfont)
     Tcl_DStringInit(&ds);
     
     if (psInfoPtr->fontVar != NULL) {
-	Arg list, *args;
+	Arg list;
+	Arg *objv;
 	int objc;
 	double size;
 	char *name;
@@ -1112,7 +1113,7 @@ Tk_TablePsFont(interp, tablePtr, tkfont)
 	name = Tk_NameOfFont(tkfont);
 	list = Tcl_GetVar2(interp, psInfoPtr->fontVar, name, 0);
 	if (list != NULL) {
-	    if (Tcl_ListObjGetElements(interp, list, &objc, &argv) != TCL_OK) {
+	    if (Tcl_ListObjGetElements(interp, list, &objc, &objv) != TCL_OK) {
 	    badMapEntry:
 		Tcl_ResetResult(interp);
 		Tcl_AppendResult(interp, "bad font map entry for \"", name,
@@ -1122,15 +1123,15 @@ Tk_TablePsFont(interp, tablePtr, tkfont)
 	    if (objc != 2) {
 		goto badMapEntry;
 	    }
-	    size = strtod(argv[1], &end);
+	    size = strtod(LangString(objv[1]), &end);
 	    if ((size <= 0) || (*end != 0)) {
 		goto badMapEntry;
 	    }
 
-	    Tcl_DStringAppend(&ds, argv[0], -1);
+	    Tcl_DStringAppend(&ds, LangString(objv[0]), -1);
 	    points = (int) size;
 	    
-	    ckfree((char *) argv);
+	    ckfree((char *) objv);
 	    goto findfont;
 	}
     } 
@@ -1302,3 +1303,4 @@ TextToPostscript(interp, tablePtr, tagPtr, tagX, tagY, width, height,
 
     return TCL_OK;
 }
+

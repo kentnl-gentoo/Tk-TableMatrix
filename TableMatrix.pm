@@ -25,7 +25,7 @@ use Carp;
 use strict;
 use vars( '%tkPriv', '$VERSION');
 
-$VERSION = '0.7';
+$VERSION = '0.71';
 
 use Tk qw( Ev );
 

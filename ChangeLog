@@ -1,3 +1,18 @@
+2001-06-15 15:19  cerney
+
+	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
+        pTk/Makefile.PL: Makeready for release 0.71
+
+2001-06-15 15:04  cerney
+
+	* Makefile.PL, pTk/Makefile.PL, pTk/mTk/Tktable/tkTable.c: Fixed to
+        compile with Tk800.022 and Tk800.023
+
+2001-06-12 18:11  cerney
+
+	* pTk/mTk/Tktable/: tkTable.c, tkTablePs.c: Updated to work with
+        Tk800.023
+
 2001-06-06 15:57  cerney
 
 	* Changes: Initial Checkin

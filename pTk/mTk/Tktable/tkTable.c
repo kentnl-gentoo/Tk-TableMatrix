@@ -663,7 +663,14 @@ Tk_TableObjCmd(clientData, interp, objc, objv)
     /* Tcl_SetStringObj(Tcl_GetObjResult(interp),
 		     Tk_PathName(tablePtr->tkwin), -1);
     */
-    Tcl_ArgResult(interp,LangWidgetArg(interp,tablePtr->tkwin));
+    /* Tk800.022 needs to old-style LangWidgetArg Call
+        newer perltk's should be ok with the default.
+    */
+#ifdef USE_LANGWIDGETARG
+    Tcl_SetObjResult(interp, LangWidgetArg(interp,tablePtr->tkwin));
+#else
+    Tcl_SetObjResult(interp, LangWidgetObj(interp,tablePtr->tkwin));
+#endif
 
     return TCL_OK;
 }

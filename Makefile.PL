@@ -9,7 +9,7 @@ BEGIN
 
   $IsWin32 = ($^O eq 'MSWin32' || $Config{'ccflags'} =~ /-D_?WIN32_?/);
 
-  $VERSION = '0.7';
+  $VERSION = '0.71';
   $win_arch = shift @ARGV if @ARGV and $ARGV[0] =~ /^(open32|pm|x|MSWin32)$/;
   require('fix_4_os2.pl'), OS2_massage() if $^O eq 'os2';
 
@@ -18,6 +18,8 @@ BEGIN
 
   require "./myConfig";
   # use lib ($Tk::MMutil::dir=getcwd);
+  
+  
  }
 
 use Tk::MMutil;
@@ -55,6 +57,7 @@ my $ptkPath = Tk::MMutil::findINC('Tk/pTk/Lang.h');
 $ptkPath =~ s/\/Lang.h$//g;
 
 
+
 Tk::MMutil::TkExtMakefile(
     'VERSION'  => $VERSION,
     'XS_VERSION' => $VERSION,
@@ -69,6 +72,7 @@ Tk::MMutil::TkExtMakefile(
     'LIBS'    => \@libs,
     'OBJECT'  => '$(O_FILES)',
     'clean'      => { FILES => 'pTk/tkConfig.h ' },
+    'PREREQ_PM'  => { Tk => 800.022},
     @macro
    );
 

@@ -2,6 +2,9 @@ Summary of Changes to Tk::TableMatrix
 
 See ChangeLog for detailed changes.
 
+Release 0.71:  6/15/01
+
+* Fixed to compile with the new Tk800.023 release.
 
 Release 0.7:  6/7/01
 

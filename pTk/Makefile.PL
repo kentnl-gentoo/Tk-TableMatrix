@@ -4,14 +4,25 @@ use ExtUtils::MakeMaker;
 use Tk::MMtry qw(try_compile);
 use Tk::MMutil;
 
+# Get existing tk version for figuring generating the define
+my $tkversion = eval 'use Tk; $Tk::VERSION;';
+#print "tkversion = $tkversion\n";
+
+if( $tkversion <= 800.022 ){
+	# Tkversion 800.022 needs the old style LandWidgetArg
+	#  instead of the new LangWidgetObj call
+	$define .= ' -DUSE_LANGWIDGETARG';
+}
+
+
 # Find path to existing pTk include files
 my $ptkPath = Tk::MMutil::findINC('Tk/pTk/Lang.h');
 $ptkPath =~ s/\/Lang.h$//g;
 
 Tk::MMutil::TkExtMakefile(
     'NAME'	=> 'Tk::pTk',
-    'VERSION'	=> '0.5',
-    'XS_VERSION'=> '0.5',
+    'VERSION'	=> '0.71',
+    'XS_VERSION'=> '0.71',
     'LINKTYPE'	=> 'static',
     'OBJECT'	=> '$(O_FILES)', 
     macro	=> { WINARCH     => $win_arch },
