@@ -9,7 +9,7 @@ BEGIN
 
   $IsWin32 = ($^O eq 'MSWin32' || $Config{'ccflags'} =~ /-D_?WIN32_?/);
 
-  $VERSION = '1.01';
+  $VERSION = '1.1';
   $win_arch = shift @ARGV if @ARGV and $ARGV[0] =~ /^(open32|pm|x|MSWin32)$/;
   require('fix_4_os2.pl'), OS2_massage() if $^O eq 'os2';
 
@@ -24,6 +24,16 @@ BEGIN
 
 use Tk::MMutil;
 
+# Get existing tk version for figuring
+$tkversion = eval 'use Tk; $Tk::VERSION;';
+#print "################tkversion = $tkversion\n";
+
+my $mydefine ='';
+if( $tkversion < 804.000 ){
+	# Tk 800 and below need the old-style XSTkCommand call
+	#  in TableMatrix.xs
+	$mydefine .= " -DTK800XSTK";
+}
 
 if ($IsWin32)
  {
@@ -36,7 +46,7 @@ if ($IsWin32)
 else
  {
   my $plibs = $Config{'libs'};
-  my $libs  = "$xlib -lX11 -lpt";
+  my $libs  = "$xlib -lX11";   # Used to have -lpt in here as well.
   my @try   = qw(-lsocket -lnsl -lm);
   push(@try,'-lc') if $^O =~ /svr4/i;
   my $lib;
@@ -65,6 +75,7 @@ Tk::MMutil::TkExtMakefile(
     'NAME'     => 'Tk::TableMatrix',
     'DIR'      => ['pTk',reverse(sort(keys %$dir))],
     'DISTNAME' => "Tk-TableMatrix",
+    'DEFINE'   => $mydefine,
     'MYEXTLIB' => 'pTk/libpTk$(LIB_EXT)' . ($win_arch =~ /^(open32|pm)$/
 					    ? ' pTk/dllInit$(LIB_EXT)'
 					    : ''),

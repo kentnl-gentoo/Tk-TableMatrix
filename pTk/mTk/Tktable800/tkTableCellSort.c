@@ -56,8 +56,8 @@ TableSortCompareProc(first, second)
     int r1, c1, r2, c2;
     char *firstString;
     char *secondString; 
-    firstString = Tcl_GetString( *((Arg*) first));
-    secondString = Tcl_GetString(*((Arg*) second));
+    firstString = LangString( *((Arg*) first));
+    secondString = LangString(*((Arg*) second));
 
 
     /* This doesn't account for badly formed indices */

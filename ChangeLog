@@ -1,3 +1,237 @@
+2004-02-23 07:43  tag TableMatrix_1_1
+
+2004-02-23 07:43  cerney
+
+	* TableMatrix.xs: Mods to work on win32 with Tk804 ( Originally
+	commited in remote repository by A0182636 on Sun Feb 22 19:10:28
+	2004 )
+
+2004-02-13 15:27  cerney
+
+	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
+	TableMatrix/SpreadsheetHideRows.pm, pTk/Makefile.PL: Preparation
+	for next release.
+
+2004-02-07 21:09  cerney
+
+	* Makefile.PL, TableMatrix.xs, myConfig, demos/spreadsheet,
+	pTk/Makefile.PL, pTk/mTk/README, pTk/mTk/Tktable/tkTable.c,
+	pTk/mTk/Tktable/tkTable.h, pTk/mTk/Tktable/tkTableCell.c,
+	pTk/mTk/Tktable/tkTableCellSort.c, pTk/mTk/Tktable/tkTableCmds.c,
+	pTk/mTk/Tktable/tkTableEdit.c, pTk/mTk/Tktable/tkTableTag.c,
+	pTk/mTk/Tktable/tkTableUtil.c, pTk/mTk/Tktable/tkTableWin.c,
+	pTk/mTk/Tktable800/Makefile.in, pTk/mTk/Tktable800/confdefs.h,
+	pTk/mTk/Tktable800/config.cache, pTk/mTk/Tktable800/config.log,
+	pTk/mTk/Tktable800/configure, pTk/mTk/Tktable800/configure.in,
+	pTk/mTk/Tktable800/mac_tkTable.mcp,
+	pTk/mTk/Tktable800/mac_tkTable.r,
+	pTk/mTk/Tktable800/mac_tkTable_prefix.h,
+	pTk/mTk/Tktable800/makefile.vc, pTk/mTk/Tktable800/mm.h,
+	pTk/mTk/Tktable800/pTk.exc, pTk/mTk/Tktable800/tkAppInit.c,
+	pTk/mTk/Tktable800/tkTable.c, pTk/mTk/Tktable800/tkTable.h,
+	pTk/mTk/Tktable800/tkTableCell.c,
+	pTk/mTk/Tktable800/tkTableCellSort.c,
+	pTk/mTk/Tktable800/tkTableCmds.c, pTk/mTk/Tktable800/tkTableEdit.c,
+	pTk/mTk/Tktable800/tkTableInitScript.h,
+	pTk/mTk/Tktable800/tkTablePs.c, pTk/mTk/Tktable800/tkTableTag.c,
+	pTk/mTk/Tktable800/tkTableUtil.c, pTk/mTk/Tktable800/tkTableWin.c,
+	pTk/mTk/Tktable800/tkTableversion.h, pTk/mTk/Tktable800/version.h:
+	Merged Changes on Tk804update branch onto main branch.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkTable.h: file tkTable.h was initially added
+	on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkTableCell.c: file tkTableCell.c was
+	initially added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkTableCellSort.c: file tkTableCellSort.c was
+	initially added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkTableCmds.c: file tkTableCmds.c was
+	initially added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkTableEdit.c: file tkTableEdit.c was
+	initially added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkTableInitScript.h: file tkTableInitScript.h
+	was initially added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkTablePs.c: file tkTablePs.c was initially
+	added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkTableTag.c: file tkTableTag.c was initially
+	added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkTableUtil.c: file tkTableUtil.c was
+	initially added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkTableWin.c: file tkTableWin.c was initially
+	added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkTableversion.h: file tkTableversion.h was
+	initially added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/version.h: file version.h was initially added
+	on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/Makefile.in: file Makefile.in was initially
+	added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/confdefs.h: file confdefs.h was initially
+	added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/config.cache: file config.cache was initially
+	added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/config.log: file config.log was initially
+	added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/configure: file configure was initially added
+	on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/configure.in: file configure.in was initially
+	added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/mac_tkTable.mcp: file mac_tkTable.mcp was
+	initially added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/mac_tkTable.r: file mac_tkTable.r was
+	initially added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/mac_tkTable_prefix.h: file
+	mac_tkTable_prefix.h was initially added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/makefile.vc: file makefile.vc was initially
+	added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/mm.h: file mm.h was initially added on branch
+	Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/pTk.exc: file pTk.exc was initially added on
+	branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkAppInit.c: file tkAppInit.c was initially
+	added on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* pTk/mTk/Tktable800/tkTable.c: file tkTable.c was initially added
+	on branch Tk804update.
+
+2004-02-07 18:36  cerney
+
+	* Makefile.PL, TableMatrix.xs, myConfig, pTk/Makefile.PL,
+	pTk/mTk/README, pTk/mTk/Tktable800/Makefile.in,
+	pTk/mTk/Tktable800/confdefs.h, pTk/mTk/Tktable800/config.cache,
+	pTk/mTk/Tktable800/config.log, pTk/mTk/Tktable800/configure,
+	pTk/mTk/Tktable800/configure.in,
+	pTk/mTk/Tktable800/mac_tkTable.mcp,
+	pTk/mTk/Tktable800/mac_tkTable.r,
+	pTk/mTk/Tktable800/mac_tkTable_prefix.h,
+	pTk/mTk/Tktable800/makefile.vc, pTk/mTk/Tktable800/mm.h,
+	pTk/mTk/Tktable800/pTk.exc, pTk/mTk/Tktable800/tkAppInit.c,
+	pTk/mTk/Tktable800/tkTable.c, pTk/mTk/Tktable800/tkTable.h,
+	pTk/mTk/Tktable800/tkTableCell.c,
+	pTk/mTk/Tktable800/tkTableCellSort.c,
+	pTk/mTk/Tktable800/tkTableCmds.c, pTk/mTk/Tktable800/tkTableEdit.c,
+	pTk/mTk/Tktable800/tkTableInitScript.h,
+	pTk/mTk/Tktable800/tkTablePs.c, pTk/mTk/Tktable800/tkTableTag.c,
+	pTk/mTk/Tktable800/tkTableUtil.c, pTk/mTk/Tktable800/tkTableWin.c,
+	pTk/mTk/Tktable800/tkTableversion.h, pTk/mTk/Tktable800/version.h:
+	Updated to make compatible with a Tk800.0xx build or a build using
+	Tk804
+
+2004-02-06 19:54  cerney
+
+	* TableMatrix.xs, demos/spreadsheet, pTk/mTk/Tktable/tkTable.c,
+	pTk/mTk/Tktable/tkTable.h, pTk/mTk/Tktable/tkTableCell.c,
+	pTk/mTk/Tktable/tkTableCellSort.c, pTk/mTk/Tktable/tkTableCmds.c,
+	pTk/mTk/Tktable/tkTableEdit.c, pTk/mTk/Tktable/tkTableTag.c,
+	pTk/mTk/Tktable/tkTableUtil.c, pTk/mTk/Tktable/tkTableWin.c:
+	Updates to compile with Tk804. Still need to resolve how to retain
+	compatibility with tk800.
+
+2003-12-05 16:24  cerney
+
+	* TableMatrix/SpreadsheetHideRows.pm, demos/SpreadsheetHideRows:
+	Updated SpreadsheetHideRows to properly hide detail of lower level
+	details when a top-level detail is hidden. Modified demo to include
+	this case.
+
+2003-11-20 11:22  cerney
+
+	* TableMatrix/Spreadsheet.pm: Doco fix.
+
+2003-09-23 06:53  cerney
+
+	* demos/edit_styles.pl: Added comments. Should have been added in
+	jan 2003.
+
+2003-01-24 07:14  cerney
+
+	* Makefile.PL: Removed libpt from the list of libraries to look
+	for, to be consistent with Tk800.024
+
+2003-01-07 15:10  cerney
+
+	* demos/embeddedWindows.pl: Initial Checkin
+
+2003-01-07 11:51  cerney
+
+	* demos/edit_styles.pl: Submitted demo from Eric Waldheim
+
+2002-12-06 08:08  tag TableMatrix_1_01
+
 2002-12-06 08:08  cerney
 
 	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
@@ -9,6 +243,8 @@
 	* pTk/mTk/Tktable/tkTable.c: Fixed Error where the rowHeight method
 	was getting executed like a colWidth. This was introduced in the
 	update of TkTable 2.5 to 2.6
+
+2002-12-02 09:44  tag TableMatrix_1_0
 
 2002-12-02 09:44  cerney
 
@@ -43,6 +279,8 @@
 	tkTableInitScript.h, tkTableTag.c, tkTableUtil.c, tkTableWin.c,
 	version.h: Merged Changed from Stock version 2.7 to 2.8. Conflicts
 	resolved, Not Tested Yet.
+
+2002-11-08 11:52  tag stock-tktable2_8
 
 2002-11-08 11:52  cerney
 
@@ -99,13 +337,15 @@
 
 2002-10-29 15:52  cerney
 
-	* pTk/mTk/Tktable/version.h: file version.h was initially added on
-	branch stock-tktable.
+	* pTk/mTk/Tktable/tkTableUtil.c: file tkTableUtil.c was initially
+	added on branch stock-tktable.
 
 2002-10-29 15:52  cerney
 
-	* pTk/mTk/Tktable/tkTableUtil.c: file tkTableUtil.c was initially
-	added on branch stock-tktable.
+	* pTk/mTk/Tktable/version.h: file version.h was initially added on
+	branch stock-tktable.
+
+2002-10-29 15:52  tag stock-tktable2_7
 
 2002-10-29 15:52  cerney
 
@@ -117,6 +357,8 @@
 2002-09-25 07:08  cerney
 
 	* COPYING: Updated to be match reality.
+
+2002-05-22 15:53  tag TableMatrix_0_9
 
 2002-05-22 15:53  cerney
 
@@ -167,6 +409,8 @@
 	collection problem). Changing the call from char* to Arg appears to
 	fix the problem.
 
+2001-10-04 07:00  tag TableMatrix_0_8
+
 2001-10-04 07:00  cerney
 
 	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
@@ -185,6 +429,8 @@
 	update/refresh properly when updating what it thought was the
 	invalid rectangle.
 
+2001-06-15 15:19  tag TableMatrix_0_71
+
 2001-06-15 15:19  cerney
 
 	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
@@ -199,6 +445,8 @@
 
 	* pTk/mTk/Tktable/: tkTable.c, tkTablePs.c: Updated to work with
 	Tk800.023
+
+2001-06-06 15:57  tag TableMatrix_0_7
 
 2001-06-06 15:57  cerney
 
@@ -245,6 +493,8 @@
 2000-12-20 07:38  cerney
 
 	* Makefile.PL: Fixed Typo
+
+2000-12-01 07:34  tag TableMatrix_0_5
 
 2000-12-01 07:34  cerney
 
@@ -294,12 +544,16 @@
 	* pTk/mTk/Tktable/tkTableCellSort.c: file tkTableCellSort.c was
 	initially added on branch stock-tktable.
 
+2000-10-26 07:48  tag stock-tktable2_6
+
 2000-10-26 07:48  cerney
 
 	* pTk/mTk/Tktable/: tkTable.c, tkTable.h, tkTableCell.c,
 	tkTableCellSort.c, tkTableCmds.c, tkTableEdit.c,
 	tkTableInitScript.h, tkTableTag.c, tkTableWin.c, tkTableversion.h:
 	tktable2.6 Source update
+
+2000-09-16 15:29  tag TableMatrix_0_3
 
 2000-09-16 15:29  cerney
 
@@ -565,6 +819,8 @@
 	mTk/Tktable/tkTableTag.c, mTk/Tktable/tkTableWin.c: Initial Try at
 	getting tktable to compile
 
+2000-06-21 07:36  tag stock-tktable2_5
+
 2000-06-21 07:36  cerney
 
 	* pTk/mTk/Tktable/pTk.exc: pTk exclude file
@@ -578,6 +834,8 @@
 	tkTableCmds.c, tkTableEdit.c, tkTableInitScript.h, tkTablePs.c,
 	tkTableTag.c, tkTableWin.c, tkTableversion.h: Stock Tktable source
 	upload
+
+2000-06-20 18:55  tag Tk_800_022
 
 2000-06-20 18:55  cerney
 

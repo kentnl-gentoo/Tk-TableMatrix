@@ -2,6 +2,11 @@ Summary of Changes to Tk::TableMatrix
 
 See ChangeLog for detailed changes.
 
+Release 1.1:   2/12/04
+
+* Updated to be compatible with the new Tk804 series.
+
+
 Release 1.01:  12/6/02
 
 * Fixed Error where the rowHeight method

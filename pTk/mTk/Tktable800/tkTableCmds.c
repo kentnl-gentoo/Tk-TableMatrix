@@ -106,8 +106,7 @@ Table_ActivateCmd(ClientData clientData, register Tcl_Interp *interp,
 		/* no error checking because GetIndex did it for us */
 		p++;
 		x = strtol(p, &p, 0) - x - tablePtr->activeX;
-		p++;
-		y = strtol(p, &p, 0) - y - tablePtr->activeY;
+		y = strtol(++p, &p, 0) - y - tablePtr->activeY;
 
 		textLayout = Tk_ComputeTextLayout(tagPtr->tkfont,
 					tablePtr->activeBuf, -1,
@@ -306,7 +305,7 @@ Table_BboxCmd(ClientData clientData, register Tcl_Interp *interp,
     return TCL_OK;
 }
 
-static CONST char *bdCmdNames[] = {
+static CONST84 char *bdCmdNames[] = {
     "mark", "dragto", (char *)NULL
 };
 enum bdCmd {
@@ -438,7 +437,7 @@ Table_BorderCmd(ClientData clientData, register Tcl_Interp *interp,
 }
 
 /* clear subcommands */
-static CONST char *clearNames[] = {
+static CONST84 char *clearNames[] = {
     "all", "cache", "sizes", "tags", (char *)NULL
 };
 enum clearCommand {

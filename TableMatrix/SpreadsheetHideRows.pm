@@ -124,7 +124,7 @@ use Tk::Derived;
 
 use base qw/ Tk::Derived Tk::TableMatrix::Spreadsheet/;
 
-$VERSION = '1.01';
+$VERSION = '1.1';
 
 
 Tk::Widget->Construct("SpreadsheetHideRows");
@@ -349,7 +349,9 @@ sub hideDetail{
 		foreach my $rowNum (sort {$a<=>$b} keys %$convertedSubData){
 			$subLevelIndex = "$rowNum,$selectorCol";
 			if( $indRowCols->{$subLevelIndex} eq '-'){
-				$lowerLevelHideRows += $self->hideDetail($rowNum,$convertedSubData);
+				# For lower-level hide-detail calls, we don't use any updates to the
+				#   expandData Arg, so we create an anonymous hash ref in this call
+				$lowerLevelHideRows += $self->hideDetail($rowNum,{ %$convertedSubData} );
 			}
 		}
 	}

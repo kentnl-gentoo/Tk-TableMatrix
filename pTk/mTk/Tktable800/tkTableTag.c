@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkTableTag.c,v 1.18 2004/02/08 03:09:46 cerney Exp $
+ * RCS: @(#) $Id: tkTableTag.c,v 1.2 2004/02/08 03:09:47 cerney Exp $
  */
  
 #include "tkVMacro.h"
@@ -27,7 +27,7 @@ static Arg	TableOptionReliefGet _ANSI_ARGS_((ClientData clientData,
 			Tk_Window tkwin, char *widgRec, int offset,
 			Tcl_FreeProc **freeProcPtr));
 
-static CONST char *tagCmdNames[] = {
+static CONST84 char *tagCmdNames[] = {
     "celltag", "cget", "coltag", "configure", "delete", "exists",
     "includes", "lower", "names", "raise", "rowtag", (char *) NULL
 };
@@ -584,7 +584,7 @@ FindRowColTag(Table *tablePtr, int cell, int mode)
 	    Tcl_Preserve((ClientData) interp);
 	    if ( LangDoCallback(interp, cmd, 1, 1, " %d", cell) == TCL_OK) {
 
-		CONST char *name = Tcl_GetStringFromObj(Tcl_GetObjResult(interp),NULL);
+		CONST char *name = Tcl_GetResult(interp);
 		if (name && *name) {
 		    /*
 		     * If a result was returned, check to see if it is
@@ -973,7 +973,7 @@ Table_TagCmd(ClientData clientData, register Tcl_Interp *interp,
 		 * which has no associated tag offset value.  This was fixed
 		 * in 8.3.5 and 8.4b1. [Bug #522882]
 		 */
-		if (Tcl_GetObjResult(interp) == NULL) {
+		if (Tcl_GetResult(interp) == NULL) {
 		    interp->result = "";
 		}
 	    }
@@ -1199,7 +1199,7 @@ Table_TagCmd(ClientData clientData, register Tcl_Interp *interp,
 	    tagname = (objc == 4) ? Tcl_GetString(objv[3]) : NULL;
 	    for (i = 0; i < tablePtr->tagPrioSize; i++) {
 		keybuf = tablePtr->tagPrioNames[i];
-		if (objc == 3 || Tcl_StringMatch(keybuf, tagname)) {
+		if (objc == 3 || LangStringMatch(keybuf, LangStringArg(tagname))) {
 		    objPtr = Tcl_NewStringObj(keybuf, -1);
 		    Tcl_ListObjAppendElement(NULL, resultPtr, objPtr);
 		}
@@ -1323,10 +1323,10 @@ TableOptionReliefSet(clientData, interp, tkwin, value, widgRec, offset)
 {
     TableTag *tagPtr = (TableTag *) widgRec;
 
-    if (STREQ(Tcl_GetString(value),""))  {
+    if (STREQ(LangString(value),""))  {
 	tagPtr->relief = -1;
     } else {
-	return Tk_GetRelief(interp, Tcl_GetString(value), &(tagPtr->relief));
+	return Tk_GetRelief(interp, LangString(value), &(tagPtr->relief));
     }
     return TCL_OK;
 }

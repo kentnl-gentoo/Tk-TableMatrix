@@ -19,7 +19,7 @@
  * See the file "license.txt" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkTable.c,v 1.31 2004/02/08 03:09:45 cerney Exp $
+ * RCS: @(#) $Id: tkTable.c,v 1.2 2004/02/08 03:09:47 cerney Exp $
  */
 
 #include "tkTable.h"
@@ -41,7 +41,7 @@
 
 
 static int	TableWidgetObjCmd _ANSI_ARGS_((ClientData clientData,
-			Tcl_Interp *interp, int objc, Tcl_Obj * CONST objv[]));
+			Tcl_Interp *interp, int objc, Tcl_Obj * objv[]));
 static int	TableConfigure _ANSI_ARGS_((Tcl_Interp *interp,
 			Table *tablePtr, int objc, Tcl_Obj *CONST objv[],
 			int flags, int forceUpdate));
@@ -71,7 +71,7 @@ static Tk_RestrictAction TableRestrictProc _ANSI_ARGS_((ClientData arg,
  * enumerated types used to dispatch the widget command.
  */
 
-static CONST char *selCmdNames[] = {
+static CONST84 char *selCmdNames[] = {
     "anchor", "clear", "includes", "present", "set", (char *)NULL
 };
 enum selCommand {
@@ -79,7 +79,7 @@ enum selCommand {
     CMD_SEL_SET
 };
 
-static CONST char *commandNames[] = {
+static CONST84 char *commandNames[] = {
     "activate", "bbox", "border", "cget", "clear", "configure",
     "curselection", "curvalue", "delete", "get", "rowHeight",
     "hidden", "icursor", "index", "insert",
@@ -340,7 +340,7 @@ Tk_ConfigSpec tableSpecs[] = {
  * Keep this in sync with the above values.
  */
 
-static CONST char *updateOpts[] = {
+static CONST84 char *updateOpts[] = {
     "-anchor",		"-background",	"-bg",		"-bd",	
     "-borderwidth",	"-cache",	"-command",	"-colorigin",
     "-cols",		"-colstretchmode",		"-coltagcommand",
@@ -636,7 +636,7 @@ TableWidgetObjCmd(clientData, interp, objc, objv)
      ClientData clientData;
      Tcl_Interp *interp;
      int objc;			/* Number of arguments. */
-     Tcl_Obj * CONST objv[];	        /* Argument objects. */
+     Tcl_Obj * objv[];	        /* Argument objects. */
 {
     register Table *tablePtr = (Table *) clientData;
     int row, col, i, cmdIndex, result = TCL_OK;
@@ -935,9 +935,9 @@ TableDestroy(ClientData clientdata)
 
     /* delete the variable trace */
     if (tablePtr->arrayVar != NULL) {
-	Lang_UntraceVar(tablePtr->interp, tablePtr->arrayVar,
+	Tcl_UntraceVar(tablePtr->interp, tablePtr->arrayVar,
 		TCL_TRACE_WRITES | TCL_TRACE_UNSETS | TCL_GLOBAL_ONLY,
-		(Lang_VarTraceProc *)TableVarProc, (ClientData) tablePtr);
+		(Tcl_VarTraceProc *)TableVarProc, (ClientData) tablePtr);
     }
 
     /* free the int arrays */
@@ -1060,7 +1060,7 @@ TableConfigure(interp, tablePtr, objc, objv, flags, forceUpdate)
     oldTitleCols	= tablePtr->titleCols;
     if (tablePtr->arrayVar != NULL) {
 	oldVar	= tablePtr->arrayVar;
-        oldVarString = Tcl_GetString(Tcl_ObjGetVar2(interp, oldVar, NULL, TCL_GLOBAL_ONLY));
+        oldVarString = LangString(Tcl_GetVar(interp, oldVar, TCL_GLOBAL_ONLY));
     }
 
 
@@ -1089,7 +1089,7 @@ TableConfigure(interp, tablePtr, objc, objv, flags, forceUpdate)
     }
 
     /* Check to see if the array variable was changed */
-    currentVarString = Tcl_GetString(Tcl_ObjGetVar2(interp, tablePtr->arrayVar, NULL, TCL_GLOBAL_ONLY));
+    currentVarString = LangString(Tcl_GetVar(interp, tablePtr->arrayVar, TCL_GLOBAL_ONLY));
 
     if (strcmp((currentVarString?currentVarString:""),
 	       (oldVarString?oldVarString:""))) {
@@ -1103,13 +1103,13 @@ TableConfigure(interp, tablePtr, objc, objv, flags, forceUpdate)
 	}
 	/* remove the trace on the old array variable if there was one */
 	if (oldVar != NULL)
-	    Lang_UntraceVar(interp, oldVar,
+	    Tcl_UntraceVar(interp, oldVar,
 		    TCL_TRACE_WRITES|TCL_TRACE_UNSETS|TCL_GLOBAL_ONLY,
-		    (Lang_VarTraceProc *)TableVarProc, (ClientData) tablePtr);
+		    (Tcl_VarTraceProc *)TableVarProc, (ClientData) tablePtr);
 	/* Check whether variable is an array and trace it if it is */
 	if (tablePtr->arrayVar != NULL) {
 	    /* does the variable exist as an array? */
-	    if (Tcl_ObjSetVar2(interp, tablePtr->arrayVar, Tcl_NewStringObj(TEST_KEY,-1), Tcl_NewStringObj("",-1),
+	    if (Tcl_SetVar2(interp, tablePtr->arrayVar, TEST_KEY, "",
 		    TCL_GLOBAL_ONLY) == NULL) {
 		Tcl_DStringAppend(&error, "invalid variable value \"", -1);
 		Tcl_DStringAppend(&error, currentVarString, -1);
@@ -1126,9 +1126,9 @@ TableConfigure(interp, tablePtr, objc, objv, flags, forceUpdate)
 			      TCL_GLOBAL_ONLY); */
 		/* remove the effect of the evaluation */
 		/* set a trace on the variable */
-		Lang_TraceVar(interp, tablePtr->arrayVar,
+		Tcl_TraceVar(interp, tablePtr->arrayVar,
 			TCL_TRACE_WRITES|TCL_TRACE_UNSETS|TCL_GLOBAL_ONLY,
-			(Lang_VarTraceProc *)TableVarProc,
+			(Tcl_VarTraceProc *)TableVarProc,
 			(ClientData) tablePtr);
 
 		/* only do the following if arrayVar is our data source */
@@ -2607,8 +2607,8 @@ TableSetActiveIndex(register Table *tablePtr)
 {
     if (tablePtr->arrayVar) {
 	tablePtr->flags |= SET_ACTIVE;
-	Tcl_ObjSetVar2(tablePtr->interp, tablePtr->arrayVar, Tcl_NewStringObj("active",-1),
-		Tcl_NewStringObj(tablePtr->activeBuf,-1), TCL_GLOBAL_ONLY);
+	Tcl_SetVar2(tablePtr->interp, tablePtr->arrayVar, "active",
+		tablePtr->activeBuf, TCL_GLOBAL_ONLY);
 	tablePtr->flags &= ~SET_ACTIVE;
     }
 }
@@ -2689,15 +2689,15 @@ TableVarProc(clientData, interp, name, index, flags)
     if ((flags & TCL_TRACE_UNSETS) && index == NULL) {
 	/* if this isn't the interpreter being destroyed reinstate the trace */
 	if ((flags & TCL_TRACE_DESTROYED) && !(flags & TCL_INTERP_DESTROYED)) {
-	    Tcl_ObjSetVar2(interp, name, Tcl_NewStringObj(TEST_KEY,-1),  Tcl_NewStringObj("",-1), TCL_GLOBAL_ONLY);
+	    Tcl_SetVar2(interp, name, TEST_KEY, "", TCL_GLOBAL_ONLY);
 	    /* Perltk not supported */
 	    /* Tcl_UnsetVar2(interp, LangString(Tcl_GetVar(interp, name, TCL_GLOBAL_ONLY)), TEST_KEY, TCL_GLOBAL_ONLY); */
 	    Tcl_ResetResult(interp);
 
 	    /* set a trace on the variable */
-	    Lang_TraceVar(interp, name,
+	    Tcl_TraceVar(interp, name,
 		    TCL_TRACE_WRITES | TCL_TRACE_UNSETS | TCL_GLOBAL_ONLY,
-		    (Lang_VarTraceProc *)TableVarProc, (ClientData) tablePtr);
+		    (Tcl_VarTraceProc *)TableVarProc, (ClientData) tablePtr);
 
 	    /* only do the following if arrayVar is our data source */
 	    if (tablePtr->dataSource & DATA_ARRAY) {
@@ -2730,7 +2730,7 @@ TableVarProc(clientData, interp, name, index, flags)
 	    row = tablePtr->activeRow;
 	    col = tablePtr->activeCol;
 	    if (tablePtr->flags & HAS_ACTIVE)
-		data = Tcl_GetString(Tcl_ObjGetVar2(interp, name, Tcl_NewStringObj(index,-1), TCL_GLOBAL_ONLY));
+		data = LangString(Tcl_GetVar2(interp, name, index, TCL_GLOBAL_ONLY));
 	    if (!data) data = "";
 
 	    if (STREQ(tablePtr->activeBuf, data)) {
@@ -2761,7 +2761,7 @@ TableVarProc(clientData, interp, name, index, flags)
 		data = (char *) Tcl_GetHashValue(entryPtr);
 		if (data) { ckfree(data); }
 	    }
-	    data = Tcl_GetString(Tcl_ObjGetVar2(interp, name, Tcl_NewStringObj(index,-1), TCL_GLOBAL_ONLY));
+	    data = LangString(Tcl_GetVar2(interp, name, index, TCL_GLOBAL_ONLY));
 	    if (!data) data = "";
 	    val = (char *)ckalloc(strlen(data)+1);
 	    strcpy(val, data);
@@ -3477,7 +3477,7 @@ TableFetchSelection(clientData, offset, buffer, maxBytes)
             existingCursor = tablePtr->cursor;
 	   /* Set Cursor to wait, becuase this can take some time for large selections */
 	    /* tablePtr->cursor = Tk_GetCursor(interp, tablePtr->tkwin, LangStringArg("watch")); */
-            Tk_DefineCursor(tablePtr->tkwin, Tk_AllocCursorFromObj(interp, tablePtr->tkwin, LangStringArg("watch")));
+            Tk_DefineCursor(tablePtr->tkwin, Tk_GetCursor(interp, tablePtr->tkwin, LangStringArg("watch")));
 
 	    Tcl_DoOneEvent(TCL_DONT_WAIT);
 	    
@@ -3507,7 +3507,7 @@ TableFetchSelection(clientData, offset, buffer, maxBytes)
 	    cslen = (colsep?(strlen(colsep)):0);
 	    numrows = numcols = 0;
 	    for (count = 0; count < listArgc; count++) {
-		TableParseArrayIndex(&r, &c, Tcl_GetString(listArgv[count]));
+		TableParseArrayIndex(&r, &c, LangString(listArgv[count]));
 		if (count) {
 		    if (lastrow != r) {
 			lastrow = r;
@@ -3564,7 +3564,7 @@ TableFetchSelection(clientData, offset, buffer, maxBytes)
 		} else {
 		    Tcl_DStringFree(&selection);
 		    Tcl_DStringInit(&selection);
-		    Tcl_DStringAppendElement(&selection, Tcl_GetStringFromObj(Tcl_GetObjResult(interp),NULL));
+		    Tcl_DStringAppendElement(&selection, Tcl_GetResult(interp));
 		}
 	    }
 	    
@@ -3810,7 +3810,7 @@ ExpandPercents(tablePtr, before, r, c, old, new, index, dsPtr, cmdType)
 	 */
 
 	string = before;
-#ifndef _LANG
+#ifdef TCL_UTF_MAX
 	/* No need to convert '%', as it is in ascii range */
 	string = (char *) Tcl_UtfFindFirst(before, '%');
 #else

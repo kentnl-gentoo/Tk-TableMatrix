@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkTableUtil.c,v 1.5 2004/02/08 03:09:46 cerney Exp $
+ * RCS: @(#) $Id: tkTableUtil.c,v 1.2 2004/02/08 03:09:48 cerney Exp $
  */
 
 #include "tkTable.h"
@@ -86,7 +86,7 @@ TableOptionBdSet(clientData, interp, tkwin, value, widgRec, offset)
     Arg *args;
 
 
-    if ((type == BD_TABLE) && (STREQ(Tcl_GetString(value),"") )) {
+    if ((type == BD_TABLE) && (STREQ(LangString(value),"") )) {
 	/*
 	 * NULL strings aren't allowed for the table global -bd
 	 */
@@ -125,7 +125,7 @@ TableOptionBdSet(clientData, interp, tkwin, value, widgRec, offset)
 	     * parsing arguments half way through.
 	     */
 	    for (i = 0; i < argc; i++) {
-		if (Tk_GetPixels(interp, tkwin, Tcl_GetString(args[i]), &(bd[i])) != TCL_OK) {
+		if (Tk_GetPixels(interp, tkwin, LangString(args[i]), &(bd[i])) != TCL_OK) {
 		    result = TCL_ERROR;
 		    break;
 		}
@@ -142,8 +142,8 @@ TableOptionBdSet(clientData, interp, tkwin, value, widgRec, offset)
 		    ckfree(*borderStr);
 		}
 		if (value) {
-		    *borderStr	= (char *) ckalloc( strlen( Tcl_GetString(value) ) + 1);
-		    strcpy(*borderStr, Tcl_GetString(value));
+		    *borderStr	= (char *) ckalloc( strlen( LangString(value) ) + 1);
+		    strcpy(*borderStr, LangString(value));
 		} else {
 		    *borderStr	= NULL;
 		}
@@ -222,7 +222,7 @@ TableTagConfigureBd(Table *tablePtr, TableTag *tagPtr,
      * First check to see if the value really changed.
      */
     if (strcmp(tagPtr->borderStr ? tagPtr->borderStr : "",
-	    Tcl_GetString(oldValue) ? Tcl_GetString(oldValue) : "") == 0) {
+	    LangString(oldValue) ? LangString(oldValue) : "") == 0) {
 	return TCL_OK;
     }
 
@@ -244,7 +244,7 @@ TableTagConfigureBd(Table *tablePtr, TableTag *tagPtr,
 	    } else {
 		for (i = 0; i < argc; i++) {
 		    if (Tk_GetPixels(tablePtr->interp, tablePtr->tkwin,
-			    Tcl_GetString(args[i]), &(tagPtr->bd[i])) != TCL_OK) {
+			    LangString(args[i]), &(tagPtr->bd[i])) != TCL_OK) {
 			result = TCL_ERROR;
 			break;
 		    }
@@ -261,7 +261,7 @@ TableTagConfigureBd(Table *tablePtr, TableTag *tagPtr,
 	    ckfree ((char *) tagPtr->borderStr);
 	}
 	if (oldValue != NULL) {
-	    size_t length = strlen(Tcl_GetString(oldValue)) + 1;
+	    size_t length = strlen(LangString(oldValue)) + 1;
 	    /*
 	     * We are making the assumption that oldValue is correct.
 	     * We have to reparse in case the bad new value had a couple
@@ -270,12 +270,12 @@ TableTagConfigureBd(Table *tablePtr, TableTag *tagPtr,
     	    Tcl_ListObjGetElements(tablePtr->interp, oldValue, &argc, &args);
 	    for (i = 0; i < argc; i++) {
 		Tk_GetPixels(tablePtr->interp, tablePtr->tkwin,
-			Tcl_GetString(args[i]), &(tagPtr->bd[i]));
+			LangString(args[i]), &(tagPtr->bd[i]));
 	    }
 	    /* ckfree ((char *) argv); */
 	    tagPtr->borders	= argc;
 	    tagPtr->borderStr	= (char *) ckalloc(length);
-	    memcpy(tagPtr->borderStr, Tcl_GetString(oldValue), length);
+	    memcpy(tagPtr->borderStr, LangString(oldValue), length);
 	} else {
 	    tagPtr->borders	= 0;
 	    tagPtr->borderStr	= (char *) NULL;
@@ -354,9 +354,9 @@ Cmd_GetName(const Cmd_Struct *cmds, int val)
 int
 Cmd_GetValue(const Cmd_Struct *cmds, Arg arg)
 {
-  unsigned int len = strlen(Tcl_GetString(arg));
+  unsigned int len = strlen(LangString(arg));
   for(;cmds->name && cmds->name[0];cmds++) {
-    if (!strncmp(cmds->name, Tcl_GetString(arg), len)) return cmds->value;
+    if (!strncmp(cmds->name, LangString(arg), len)) return cmds->value;
   }
   return 0;
 }
@@ -365,7 +365,7 @@ void
 Cmd_GetError(Tcl_Interp *interp, const Cmd_Struct *cmds, Arg arg)
 {
   int i;
-  char *argstring = Tcl_GetString(arg);
+  char *argstring = LangString(arg);
   Tcl_AppendResult(interp, "bad option \"", argstring, "\" must be ", (char *) 0);
   for(i=0;cmds->name && cmds->name[0];cmds++,i++) {
     Tcl_AppendResult(interp, (i?", ":""), cmds->name, (char *) 0);

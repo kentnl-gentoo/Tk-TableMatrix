@@ -15,6 +15,7 @@ $define = '';
 $gccopt = "";
 @macro = ( macro => {} );
 
+
 if (defined $Config{'gccversion'})
  {
   $ver = $Config{'gccversion'};

@@ -8,7 +8,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkTableEdit.c,v 1.6 2004/02/08 03:09:46 cerney Exp $
+ * RCS: @(#) $Id: tkTableEdit.c,v 1.2 2004/02/08 03:09:47 cerney Exp $
  */
 
 #include "tkVMacro.h"
@@ -21,7 +21,7 @@ static void	TableModifyRC _ANSI_ARGS_((register Table *tablePtr,
 			int outOfBounds));
 
 /* insert/delete subcommands */
-static CONST char *modCmdNames[] = {
+static CONST84 char *modCmdNames[] = {
     "active", "cols", "rows", (char *)NULL
 };
 enum modCmd {
@@ -29,7 +29,7 @@ enum modCmd {
 };
 
 /* insert/delete row/col switches */
-static CONST char *rcCmdNames[] = {
+static CONST84 char *rcCmdNames[] = {
     "-keeptitles",	"-holddimensions",	"-holdselection",
     "-holdtags",	"-holdwindows",	"--",
     (char *) NULL

@@ -75,7 +75,7 @@ my $currentLabel = $top->Label(-textvariable => \$currentText);
 my $activeText = '';
 my $activeEntry = $top->Entry(-textvariable => \$activeText);
 
-my $pageLabel = $top->Label(-text => 'PAGE:', -width => 6, anchor => 'e');
+my $pageLabel = $top->Label(-text => 'PAGE:', -width => 6, -anchor => 'e');
 my $pageSelect = $top->Optionmenu( -options => [ qw/ AA BB CC/], 
 		-variable => \$page,
 		-command => [ \&changepage]);

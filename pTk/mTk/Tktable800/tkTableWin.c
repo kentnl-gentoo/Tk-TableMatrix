@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkTableWin.c,v 1.10 2004/02/08 03:09:47 cerney Exp $
+ * RCS: @(#) $Id: tkTableWin.c,v 1.2 2004/02/08 03:09:48 cerney Exp $
  */
  
 #include "tkVMacro.h"
@@ -44,7 +44,7 @@ static Tk_GeomMgr tableGeomType = {
 };
 
 /* windows subcommands */
-static CONST char *winCmdNames[] = {
+static CONST84 char *winCmdNames[] = {
     "cget", "configure", "delete", "move", "names", (char *) NULL
 };
 enum winCommand {
@@ -172,7 +172,7 @@ StickyParseProc(clientData, interp, tkwin, value, widgRec, offset)
     register TableEmbWindow *ewPtr = (TableEmbWindow *) widgRec;
     int sticky = 0;
     char c;
-    char * valuestring = Tcl_GetString(value);
+    char * valuestring = LangString(value);
 
     while ((c = *valuestring++) != '\0') {
 	switch (c) {
@@ -943,14 +943,14 @@ Table_WindowCmd(ClientData clientData, register Tcl_Interp *interp,
 	entryPtr = Tcl_FirstHashEntry(tablePtr->winTable, &search);
 	while (entryPtr != NULL) {
 	    keybuf = Tcl_GetHashKey(tablePtr->winTable, entryPtr);
-	    if (objc == 3 || Tcl_StringMatch(keybuf, winname) ) {
+	    if (objc == 3 || LangStringMatch(keybuf, LangStringArg(winname)) ) {
 		Tcl_ListObjAppendElement(NULL, objPtr,
 					 Tcl_NewStringObj(keybuf, -1));
 	    }
 	    entryPtr = Tcl_NextHashEntry(&search);
 	}
 	Tcl_SetResult(interp,
-		      Tcl_GetString(TableCellSort(tablePtr, Tcl_GetStringFromObj(Tcl_GetObjResult(interp),NULL))),
+		      LangString(TableCellSort(tablePtr, Tcl_GetResult(interp))),
 		      TCL_DYNAMIC);
 	break;
     }

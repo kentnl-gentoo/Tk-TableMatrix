@@ -6,7 +6,7 @@ Tk::TableMatrix::Spreadsheet - Table Display with Spreadsheet-like bindings.
 =head1 SYNOPSIS
 
   use Tk;
-  use Tk::TableMatrix::Spreadsheet
+  use Tk::TableMatrix::Spreadsheet;
 
 
 
@@ -90,7 +90,7 @@ use Tk::Derived;
 
 use base qw/ Tk::Derived Tk::TableMatrix/;
 
-$VERSION = '1.01';
+$VERSION = '1.1';
 
 
 Tk::Widget->Construct("Spreadsheet");

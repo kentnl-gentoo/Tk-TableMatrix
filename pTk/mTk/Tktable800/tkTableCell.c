@@ -9,7 +9,7 @@
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkTableCell.c,v 1.17 2004/02/08 03:09:46 cerney Exp $
+ * RCS: @(#) $Id: tkTableCell.c,v 1.2 2004/02/08 03:09:47 cerney Exp $
  */
  
 #include "tkVMacro.h"
@@ -504,11 +504,11 @@ TableGetCellValue(Table *tablePtr, int r, int c)
 	    Tcl_BackgroundError(interp);
 	    TableInvalidateAll(tablePtr, 0);
 	} else {
-	    result = (char *) Tcl_GetStringFromObj(Tcl_GetObjResult(interp),NULL);
+	    result = (char *) Tcl_GetResult(interp);
 	}
 	/* Tcl_FreeResult(interp); not support for perl/tk */
     } else if (tablePtr->arrayVar) {
-	result = Tcl_GetString(Tcl_ObjGetVar2(interp, tablePtr->arrayVar, Tcl_NewStringObj(buf,-1),
+	result = LangString(Tcl_GetVar2(interp, tablePtr->arrayVar, buf,
 	        TCL_GLOBAL_ONLY));
     }
     if (result == NULL)
@@ -614,7 +614,7 @@ TableSetCellValue(Table *tablePtr, int r, int c, char *value)
 	    /* Tcl_UnsetVar2(interp, LangString(Tcl_GetVar(interp, tablePtr->arrayVar, TCL_GLOBAL_ONLY)), buf, TCL_GLOBAL_ONLY); */
 	    /* Replaced with This (defined in tkTable.xs) */
 	    tkTableUnsetElement(tablePtr->arrayVar, buf);
-	} else if (Tcl_ObjSetVar2(interp, tablePtr->arrayVar, Tcl_NewStringObj(buf,-1), Tcl_NewStringObj(value,-1),
+	} else if (Tcl_SetVar2(interp, tablePtr->arrayVar, buf, value,
 			       TCL_GLOBAL_ONLY|TCL_LEAVE_ERR_MSG) == NULL) {
 	    code = TCL_ERROR;
 	}
@@ -721,7 +721,7 @@ TableMoveCellValue(Table *tablePtr, int fromr, int fromc, char *frombuf,
 		 * Warning: checking for \0 as the first char could invalidate
 		 * allowing it as a valid first char
 		 */
-		if (Tcl_ObjSetVar2(interp, tablePtr->arrayVar, Tcl_NewStringObj(tobuf,-1), Tcl_NewStringObj(result, -1),
+		if (Tcl_SetVar2(interp, tablePtr->arrayVar, tobuf, result,
 			TCL_GLOBAL_ONLY|TCL_LEAVE_ERR_MSG) == NULL) {
 		    return TCL_ERROR;
 		}
@@ -773,7 +773,7 @@ TableGetIcursor(Table *tablePtr, char *arg, int *posn)
     } else if (strcmp(arg, "insert") == 0) {
 	tmp = tablePtr->icursor;
     } else {
-	if (Tcl_GetIntFromObj(tablePtr->interp, LangStringArg(arg), &tmp) != TCL_OK) {
+	if (Tcl_GetInt(tablePtr->interp, LangStringArg(arg), &tmp) != TCL_OK) {
 	    return TCL_ERROR;
 	}
 	CONSTRAIN(tmp, 0, len);
@@ -1318,7 +1318,7 @@ Table_HiddenCmd(ClientData clientData, register Tcl_Interp *interp,
 				     Tcl_GetHashKey(tablePtr->spanAffTbl,
 						    entryPtr));
 	}
-	span = Tcl_GetString(TableCellSort(tablePtr, Tcl_DStringValue(&cells)));
+	span = LangString(TableCellSort(tablePtr, Tcl_DStringValue(&cells)));
 	if (span != NULL) {
 	    Tcl_SetResult(interp, span, TCL_DYNAMIC);
 	}

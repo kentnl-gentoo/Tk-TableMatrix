@@ -9,7 +9,7 @@
  * See the file "license.txt" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
  *
- * RCS: @(#) $Id: tkTable.h,v 1.18 2004/02/08 03:09:45 cerney Exp $
+ * RCS: @(#) $Id: tkTable.h,v 1.2 2004/02/08 03:09:47 cerney Exp $
  */
 
 #ifndef _TKTABLE_H_
@@ -32,8 +32,6 @@
 #if (TCL_MAJOR_VERSION == 8) && (TCL_MINOR_VERSION == 0) /* Tcl8.0 stuff */
 #define Tcl_GetString(objPtr)	Tcl_GetStringFromObj(objPtr, (int *)NULL)
 #endif
-
-#define Arg Tcl_Obj*
 
 /*
  * Tcl/Tk 8.4 introduced better CONST-ness in the APIs, but we use CONST84 in

@@ -4,9 +4,6 @@ use ExtUtils::MakeMaker;
 use Tk::MMtry qw(try_compile);
 use Tk::MMutil;
 
-# Get existing tk version for figuring generating the define
-my $tkversion = eval 'use Tk; $Tk::VERSION;';
-#print "tkversion = $tkversion\n";
 
 if( $tkversion <= 800.022 ){
 	# Tkversion 800.022 needs the old style LandWidgetArg
@@ -14,6 +11,15 @@ if( $tkversion <= 800.022 ){
 	$define .= ' -DUSE_LANGWIDGETARG';
 }
 
+# mTk directory to use for munging into the pTk dir.
+#   If Tk804 or greater, use the normal Tktable dir.
+#   If otherwise using the old Tktable800 dir
+my $mTkDir = 'Tktable';
+if( $tkversion < 804.000 ){
+	print STDERR "### Your Tk version is less than 804.        ###\n";
+	print STDERR "### Ok, Using Tk800.0XX dir 'mTk/Tktable800' ###\n";
+	$mTkDir = 'Tktable800';
+}
 
 # Find path to existing pTk include files
 my $ptkPath = Tk::MMutil::findINC('Tk/pTk/Lang.h');
@@ -21,7 +27,7 @@ $ptkPath =~ s/\/Lang.h$//g;
 
 Tk::MMutil::TkExtMakefile(
     'NAME'	=> 'Tk::pTk',
-    'VERSION'	=> '1.01',
+    'VERSION'	=> '1.1',
     'XS_VERSION'=> '0.9',
     'LINKTYPE'	=> 'static',
     'OBJECT'	=> '$(O_FILES)', 
@@ -52,19 +58,19 @@ sub MY::post_initialize
  my @list;
  if ($Tk::MMutil::IsWin32)
   {  # only Tktable needed for everything
-   @list = qw( Tktable);
+   @list = ($mTkDir);
   }
  elsif ($win_arch eq 'open32')
   {
-   @list = qw( Tktable);
+   @list = ($mTkDir);
   }
  elsif ($win_arch eq 'pm')
   {
-   @list = qw( Tktable);
+   @list = ($mTkDir);
   }
  else
   {
-   @list = qw( Tktable);
+   @list = ($mTkDir);
   }
  print STDERR "Generating Dependencies for $^O, win_arch=$win_arch\n";
  foreach $dir (@list)
