@@ -662,15 +662,13 @@ Table_CurselectionCmd(ClientData clientData, register Tcl_Interp *interp,
 	    TableRefresh(tablePtr, row, col, CELL);
 	}
     } else {
-	Tcl_Obj *objPtr = Tcl_NewObj();
-
 	for (entryPtr = Tcl_FirstHashEntry(tablePtr->selCells, &search);
 	     entryPtr != NULL; entryPtr = Tcl_NextHashEntry(&search)) {
-	    value = Tcl_GetHashKey(tablePtr->selCells, entryPtr);
-	    Tcl_ListObjAppendElement(NULL, objPtr,
-				     Tcl_NewStringObj(value, -1));
+	    Tcl_AppendElement(interp,
+			      Tcl_GetHashKey(tablePtr->selCells, entryPtr));
+
 	}
-	Tcl_SetObjResult(interp, TableCellSortObj(interp, objPtr));
+	Tcl_ArgResult(interp,TableCellSort(tablePtr, Tcl_GetResult(interp)));
     }
     return TCL_OK;
 }

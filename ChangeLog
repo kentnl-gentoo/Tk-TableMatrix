@@ -1,3 +1,53 @@
+2001-06-06 15:57  cerney
+
+	* Changes: Initial Checkin
+
+2001-06-06 15:56  cerney
+
+	* TableMatrix/Spreadsheet.pm: Added version to Spreadsheet.pm in
+        preparation for release.
+
+2001-06-06 11:58  cerney
+
+	* TableMatrix.pm, Makefile.PL: Updated version in preparation for
+        release.
+
+2001-06-06 11:43  cerney
+
+	* pTk/mTk/Tktable/: tkTableCell.c, tkTableCellSort.c,
+	tkTableCmds.c, tkTableWin.c: Reverted back to the cell sorting
+	method implemented in tktable 2.5 (and TableMatrix 0.3).  The new
+	cell sorting method didn't sort negative row/column indexes
+	correctly, which caused the data from a copy/paste operation to be
+	out-of-order, if the selection included multiple negative row/col
+        indexes.
+
+2001-06-05 12:12  cerney
+
+	* TableMatrix/Spreadsheet.pm, demos/TableMatrixSpreadsheetTest,
+	t/create.t: Added TableMatrix::Spreadsheet. TableMatrix Derived
+        object with excel-like bindings
+
+2001-06-01 06:43  cerney
+
+	* TableMatrix.pm: Applied Slaven's patch to fix the control-+/-
+        bindings for modifying the column width.
+
+2000-12-24 13:01  cerney
+
+	* pTk/: Makefile.PL, mTk/Tktable/tkTable.c: Fixed Version in
+	pTk/Makefile.PL Removed the hard-coded forceupdate=1 in tkTable.c
+	to reduce the flashing seen when updating the cursor. This may have
+        other side effects... needs to be watched.
+
+2000-12-20 07:38  cerney
+
+	* Makefile.PL: Fixed Typo
+
+2000-12-01 07:34  cerney
+
+	* README: Fixed version called out in the file
+
 2000-12-01 07:19  cerney
 
 	* Makefile.PL: Fixed Version

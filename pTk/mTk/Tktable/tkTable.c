@@ -1257,7 +1257,7 @@ TableConfigure(interp, tablePtr, objc, objv, flags, forceUpdate)
     }
 
     /* only do the full reconfigure if absolutely necessary */
-    forceUpdate = 1;
+    /*forceUpdate = 1;*/
     if (!forceUpdate) {
 	int i, dummy;
 	for (i = 0; i < objc-1; i += 2) {

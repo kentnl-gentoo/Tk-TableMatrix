@@ -5,11 +5,11 @@ no  lib '.';
 BEGIN
  {
  
-  warn("### Note: 'Building Outside of Tk itself' Mesages are Expected Here ####\n");
+  warn("### Note: 'Building Outside of Tk itself' Messages are Expected Here ####\n");
 
   $IsWin32 = ($^O eq 'MSWin32' || $Config{'ccflags'} =~ /-D_?WIN32_?/);
 
-  $VERSION = '0.5';
+  $VERSION = '0.7';
   $win_arch = shift @ARGV if @ARGV and $ARGV[0] =~ /^(open32|pm|x|MSWin32)$/;
   require('fix_4_os2.pl'), OS2_massage() if $^O eq 'os2';
 

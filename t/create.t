@@ -17,6 +17,7 @@ BEGIN
 	# Tk core widgets
 	qw(
 		TableMatrix
+		TableMatrix::Spreadsheet
 		
 	)
    );
@@ -43,8 +44,10 @@ foreach my $class (@class)
     eval "require Tk::$class;";
     ok($@, "", "Error loading Tk::$class");
     ok("Tk::$class"->isa('Tk::Widget'),1,"Tk::$class is not a widget");
-
-    eval { $w = $mw->$class(); };
+    
+    my $classCall = $class; # name of class, as it is called
+    $classCall =~ s/.+?\:\://; 
+    eval { $w = $mw->$classCall(); };
     ok($@, "", "can't create $class widget");
     skip($@, Tk::Exists($w), 1, "$class instance does not exist");
 

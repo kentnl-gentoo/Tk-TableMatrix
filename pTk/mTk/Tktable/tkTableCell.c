@@ -1136,20 +1136,26 @@ Table_HiddenCmd(ClientData clientData, register Tcl_Interp *interp,
     }
     if (objc == 2) {
 	/* return all "hidden" cells */
+	Tcl_DString cells;
 	Tcl_HashSearch search;
-	Tcl_Obj *objPtr = Tcl_NewObj();
 
+
+	Tcl_DStringInit(&cells);
 	for (entryPtr = Tcl_FirstHashEntry(tablePtr->spanAffTbl, &search);
 	     entryPtr != NULL; entryPtr = Tcl_NextHashEntry(&search)) {
 	    if ((span = (char *) Tcl_GetHashValue(entryPtr)) == NULL) {
 		/* this is actually a spanning cell */
 		continue;
 	    }
-	    Tcl_ListObjAppendElement(NULL, objPtr,
-			Tcl_NewStringObj(Tcl_GetHashKey(tablePtr->spanAffTbl,
-							entryPtr), -1));
+	    Tcl_DStringAppendElement(&cells,
+				     Tcl_GetHashKey(tablePtr->spanAffTbl,
+						    entryPtr));
 	}
-	Tcl_SetObjResult(interp, TableCellSortObj(interp, objPtr));
+	span = LangString(TableCellSort(tablePtr, Tcl_DStringValue(&cells)));
+	if (span != NULL) {
+	    Tcl_SetResult(interp, span, TCL_DYNAMIC);
+	}
+	Tcl_DStringFree(&cells);
 	return TCL_OK;
     }
     if (objc == 3) {

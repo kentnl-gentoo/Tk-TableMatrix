@@ -25,7 +25,7 @@ use Carp;
 use strict;
 use vars( '%tkPriv', '$VERSION');
 
-$VERSION = '0.5';
+$VERSION = '0.7';
 
 use Tk qw( Ev );
 
@@ -864,13 +864,13 @@ sub ChangeWidth
  my $tmp;
  my $width;
  $tmp = $w->index($i,'col');
- if (($width = $w->width($tmp)) >= 0)
+ if (($width = $w->colWidth($tmp)) >= 0)
   {
-   $w->width($tmp,$width += $a);
+   $w->colWidth($tmp,$width += $a);
   }
  else
   {
-   $w->width($tmp,$width += -$a);
+   $w->colWidth($tmp,$width += -$a);
   }
 }
 # Copy --

@@ -10,8 +10,8 @@ $ptkPath =~ s/\/Lang.h$//g;
 
 Tk::MMutil::TkExtMakefile(
     'NAME'	=> 'Tk::pTk',
-    'VERSION'	=> '0.3',
-    'XS_VERSION'=> '0.3',
+    'VERSION'	=> '0.5',
+    'XS_VERSION'=> '0.5',
     'LINKTYPE'	=> 'static',
     'OBJECT'	=> '$(O_FILES)', 
     macro	=> { WINARCH     => $win_arch },

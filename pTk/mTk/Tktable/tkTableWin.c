@@ -929,7 +929,9 @@ Table_WindowCmd(ClientData clientData, register Tcl_Interp *interp,
 	    }
 	    entryPtr = Tcl_NextHashEntry(&search);
 	}
-	Tcl_SetObjResult(interp, TableCellSortObj(interp, objPtr));
+	Tcl_SetResult(interp,
+		      LangString(TableCellSort(tablePtr, Tcl_GetResult(interp))),
+		      TCL_DYNAMIC);
 	break;
     }
     }
