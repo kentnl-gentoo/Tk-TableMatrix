@@ -1,5 +1,5 @@
 /*
- * This is a port of the tcl/tk Tktable Widget version 2.5 to perl/tk
+ * This is a port of the tcl/tk Tktable Widget version 2.6 to perl/tk
  */
 
 		*************************************
@@ -8,7 +8,8 @@
 
 INTRODUCTION
 
-Tk::TableMatrix is a table/matrix widget extension to perl/tk.
+Tk::TableMatrix is a table/matrix widget extension to perl/tk
+for displaying data in a table (or spreadsheet) format.
 The basic features of the widget are:
 
  * multi-line cells

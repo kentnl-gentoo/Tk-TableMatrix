@@ -49,18 +49,17 @@ TableTrueCell(Table *tablePtr, int r, int c, int *row, int *col)
 	TableMakeArrayIndex(r, c, buf);
 	entryPtr = Tcl_FindHashEntry(tablePtr->spanAffTbl, buf);
 	if ((entryPtr != NULL) &&
-	    ((char *)Tcl_GetHashValue(entryPtr) != NULL)) {
+		((char *)Tcl_GetHashValue(entryPtr) != NULL)) {
 	    /* This cell is covered by another spanning cell */
 	    /* We need to return the coords for that cell */
-	    TableParseArrayIndex(row, col,
-				 (char *)Tcl_GetHashValue(entryPtr));
+	    TableParseArrayIndex(row, col, (char *)Tcl_GetHashValue(entryPtr));
 	    return 0;
 	}
     }
-    *row = MIN(MAX(tablePtr->rowOffset,r),
-	       tablePtr->rows-1+tablePtr->rowOffset);
-    *col = MIN(MAX(tablePtr->colOffset,c),
-	       tablePtr->cols-1+tablePtr->colOffset);
+    *row = BETWEEN(r, tablePtr->rowOffset,
+	    tablePtr->rows-1+tablePtr->rowOffset);
+    *col = BETWEEN(c, tablePtr->colOffset,
+	    tablePtr->cols-1+tablePtr->colOffset);
     return ((*row == r) && (*col == c));
 }
 
@@ -91,17 +90,21 @@ TableCellCoords(Table *tablePtr, int row, int col,
 	*w = *h = *x = *y = 0;
 	return CELL_BAD;
     }
-    /* real coords required, always should be passed acceptable values,
-   * but this is a possible seg fault otherwise */
+    /*
+     * Real coords required, always should be passed acceptable values,
+     * but this is a possible seg fault otherwise
+     */
+#define BOUNDS_CHECK 1
 #ifdef BOUNDS_CHECK
-    row = MIN(tablePtr->rows-1, MAX(0, row));
-    col = MIN(tablePtr->cols-1, MAX(0, col));
+    CONSTRAIN(row, 0, tablePtr->rows-1);
+    CONSTRAIN(col, 0, tablePtr->cols-1);
 #endif
     *w = tablePtr->colPixels[col];
     *h = tablePtr->rowPixels[row];
-    /* Adjust for sizes of spanning cells
-   * and ensure that this cell isn't "hidden"
-   */
+    /*
+     * Adjust for sizes of spanning cells
+     * and ensure that this cell isn't "hidden"
+     */
     if (tablePtr->spanAffTbl && !(tablePtr->flags & AVOID_SPANS)) {
 	char buf[INDEX_BUFSIZE];
 	Tcl_HashEntry *entryPtr;
@@ -152,14 +155,16 @@ TableCellCoords(Table *tablePtr, int row, int col,
 	}
     }
 setxy:
-    *x = hl + tablePtr->colStarts[col] - 
-	((col < tablePtr->titleCols) ? 0 :
-	 tablePtr->colStarts[tablePtr->leftCol]
-	 - tablePtr->colStarts[tablePtr->titleCols]);
-    *y = hl + tablePtr->rowStarts[row] -
-	((row < tablePtr->titleRows) ? 0 :
-	 tablePtr->rowStarts[tablePtr->topRow]
-	 - tablePtr->rowStarts[tablePtr->titleRows]);
+    *x = hl + tablePtr->colStarts[col];
+    if (col >= tablePtr->titleCols) {
+	*x -= tablePtr->colStarts[tablePtr->leftCol]
+	    - tablePtr->colStarts[tablePtr->titleCols];
+    }
+    *y = hl + tablePtr->rowStarts[row];
+    if (row >= tablePtr->titleRows) {
+	*y -= tablePtr->rowStarts[tablePtr->topRow]
+	    - tablePtr->rowStarts[tablePtr->titleRows];
+    }
     return result;
 }
 
@@ -204,7 +209,7 @@ TableCellVCoords(Table *tablePtr, int row, int col,
 	 * cell is visible */
 	int topX = tablePtr->colStarts[tablePtr->titleCols]+hl;
 	int topY = tablePtr->rowStarts[tablePtr->titleRows]+hl;
-	if (col < tablePtr->leftCol && col >= tablePtr->titleCols) {
+	if ((col < tablePtr->leftCol) && (col >= tablePtr->titleCols)) {
 	    if (full || (x+w < topX)) {
 		return 0;
 	    } else {
@@ -212,7 +217,7 @@ TableCellVCoords(Table *tablePtr, int row, int col,
 		x = topX;
 	    }
 	}
-	if (row < tablePtr->topRow && row >= tablePtr->titleRows) {
+	if ((row < tablePtr->topRow) && (row >= tablePtr->titleRows)) {
 	    if (full || (y+h < topY)) {
 		return 0;
 	    } else {
@@ -582,83 +587,6 @@ TableSetCellValue(Table *tablePtr, int r, int c, char *value)
 /*
  *----------------------------------------------------------------------
  *
- * TableSortCompareProc --
- *	This procedure is invoked by qsort to determine the proper
- *	ordering between two elements.
- *
- * Results:
- *	< 0 means first is "smaller" than "second", > 0 means "first"
- *	is larger than "second", and 0 means they should be treated
- *	as equal.
- *
- * Side effects:
- *	None, unless a user-defined comparison command does something
- *	weird.
- *
- *----------------------------------------------------------------------
- */
-static int
-TableSortCompareProc(first, second)
-    CONST VOID *first, *second;		/* Elements to be compared. */
-{
-    int r1, c1, r2, c2;
-    char *firstString;
-    char *secondString; 
-    firstString = LangString( *((Arg*) first));
-    secondString = LangString(*((Arg*) second));
-
-
-    /* This doesn't account for badly formed indices */
-    sscanf(firstString, "%d,%d", &r1, &c1);
-    sscanf(secondString, "%d,%d", &r2, &c2);
-    if (r1 > r2) {
-	return 1;
-    } else if (r1 < r2) {
-	return -1;
-    } else if (c1 > c2) {
-	return 1;
-    } else if (c1 < c2) {
-	return -1;
-    }
-    return 0;
-}
-
-/*
- *----------------------------------------------------------------------
- *
- * TableCellSort --
- *	Sort a list of table cell elements (of form row,col)
- *
- * Results:
- *	Returns the sorted list of elements.  Because Tcl_Merge allocs
- *	the space for result, it must later be Tcl_Free'd by caller.
- *
- * Side effects:
- *	Behaviour undefined for ill-formed input list of elements.
- *
- *----------------------------------------------------------------------
- */
-Arg
-TableCellSort(Table *tablePtr, char *str)
-{
-    int listArgc;
-    Arg *listArgv;
-    Arg  result;
-    Arg  argstr;
-    argstr = LangStringArg(str);
-    if (Tcl_ListObjGetElements(tablePtr->interp, argstr, &listArgc, &listArgv) != TCL_OK) {
-        ckfree((char *) argstr);
-	return LangStringArg(str);
-    }
-    qsort((VOID *) listArgv, (size_t) listArgc, sizeof (char *),
-	  TableSortCompareProc);
-    result = Tcl_NewListObj(listArgc, listArgv);
-    return result;
-}
-
-/*
- *----------------------------------------------------------------------
- *
  * TableGetIcursor --
  *	Parses the argument as an index into the active cell string.
  *	Recognises 'end', 'insert' or an integer.  Constrains it to the
@@ -693,7 +621,7 @@ TableGetIcursor(Table *tablePtr, char *arg, int *posn)
 	if (Tcl_GetInt(tablePtr->interp, LangStringArg(arg), &tmp) != TCL_OK) {
 	    return TCL_ERROR;
 	}
-	tmp = MIN(MAX(0, tmp), len);
+	CONSTRAIN(tmp, 0, len);
     }
     if (posn) {
 	*posn = tmp;
@@ -751,9 +679,9 @@ TableGetIndex(tablePtr, str, row_p, col_p)
 	    goto IndexError;
 	}
 	/* ensure appropriate user index */
-	r = MIN(MAX(tablePtr->rowOffset,r),
+	CONSTRAIN(r, tablePtr->rowOffset,
 		tablePtr->rows-1+tablePtr->rowOffset);
-	c = MIN(MAX(tablePtr->colOffset,c),
+	CONSTRAIN(c, tablePtr->colOffset,
 		tablePtr->cols-1+tablePtr->colOffset);
     } else if (len > 1 && strncmp(str, "active", len) == 0 ) {	/* active */
 	if (tablePtr->flags & HAS_ACTIVE) {
@@ -1208,25 +1136,20 @@ Table_HiddenCmd(ClientData clientData, register Tcl_Interp *interp,
     }
     if (objc == 2) {
 	/* return all "hidden" cells */
-	Tcl_DString cells;
 	Tcl_HashSearch search;
+	Tcl_Obj *objPtr = Tcl_NewObj();
 
-	Tcl_DStringInit(&cells);
 	for (entryPtr = Tcl_FirstHashEntry(tablePtr->spanAffTbl, &search);
 	     entryPtr != NULL; entryPtr = Tcl_NextHashEntry(&search)) {
 	    if ((span = (char *) Tcl_GetHashValue(entryPtr)) == NULL) {
 		/* this is actually a spanning cell */
 		continue;
 	    }
-	    Tcl_DStringAppendElement(&cells,
-				     Tcl_GetHashKey(tablePtr->spanAffTbl,
-						    entryPtr));
+	    Tcl_ListObjAppendElement(NULL, objPtr,
+			Tcl_NewStringObj(Tcl_GetHashKey(tablePtr->spanAffTbl,
+							entryPtr), -1));
 	}
-	span = LangString(TableCellSort(tablePtr, Tcl_DStringValue(&cells)));
-	if (span != NULL) {
-	    Tcl_SetResult(interp, span, TCL_DYNAMIC);
-	}
-	Tcl_DStringFree(&cells);
+	Tcl_SetObjResult(interp, TableCellSortObj(interp, objPtr));
 	return TCL_OK;
     }
     if (objc == 3) {

@@ -4,7 +4,7 @@
  *	This is the header file for the module that implements
  *	table widgets for the Tk toolkit.
  *
- * Copyright (c) 1997-1999 Jeffrey Hobbs
+ * Copyright (c) 1997-2000 Jeffrey Hobbs
  *
  * See the file "license.terms" for information on usage and redistribution
  * of this file, and for a DISCLAIMER OF ALL WARRANTIES.
@@ -112,6 +112,10 @@
 
 #define MAX(A,B)	(((A)>(B))?(A):(B))
 #define MIN(A,B)	(((A)>(B))?(B):(A))
+#define BETWEEN(val,min,max)	( ((val)<(min)) ? (min) : \
+				( ((val)>(max)) ? (max) : (val) ) )
+#define CONSTRAIN(val,min,max)	if ((val) < (min)) { (val) = (min); } \
+				else if ((val) > (max)) { (val) = (max); }
 #define ARSIZE(A)	(sizeof(A)/sizeof(*A))
 #define INDEX_BUFSIZE	32		/* max size of buffer for indices */
 #define TEST_KEY	"#TEST KEY#"	/* index for testing array existence */
@@ -171,6 +175,7 @@
 				 * row/col will affect neighbors */
 #define INV_FORCE	(1L<<4)
 #define INV_HIGHLIGHT	(1L<<5)
+#define INV_NO_ERR_MSG	(1L<<5) /* Don't leave an error message */
 
 /* These alter how the selection set/clear commands behave */
 #define SEL_ROW		(1<<0)
@@ -487,7 +492,6 @@ extern int	TableAtBorder _ANSI_ARGS_((Table *tablePtr, int x, int y,
 extern char *	TableGetCellValue _ANSI_ARGS_((Table *tablePtr, int r, int c));
 extern int	TableSetCellValue _ANSI_ARGS_((Table *tablePtr, int r, int c,
 			char *value));
-extern Arg	TableCellSort _ANSI_ARGS_((Table *tablePtr, char *str));
 extern int	TableGetIcursor _ANSI_ARGS_((Table *tablePtr, char *arg,
 			int *posn));
 #define TableGetIcursorObj(tablePtr, objPtr, posnPtr) \
@@ -503,6 +507,21 @@ extern int	Table_HiddenCmd _ANSI_ARGS_((ClientData clientData,
 extern int	Table_SpanCmd _ANSI_ARGS_((ClientData clientData,
 			Tcl_Interp *interp, int objc, Tcl_Obj *CONST objv[]));
 extern void	TableSpanSanCheck _ANSI_ARGS_((register Table *tablePtr));
+
+/*
+ * HEADERS IN TKTABLECELLSORT
+ */
+/*
+ * We keep the old CellSort true because it is used for grabbing
+ * the selection, so we really want them ordered
+ */
+extern Arg	TableCellSort _ANSI_ARGS_((Table *tablePtr, char *str));
+#ifdef NO_SORT_CELLS
+#  define TableCellSortObj(interp, objPtr) (objPtr)
+#else
+extern Tcl_Obj*	TableCellSortObj _ANSI_ARGS_((Tcl_Interp *interp,
+			Tcl_Obj *listObjPtr));
+#endif
 
 /*
  * HEADERS IN TKTABLEPS
