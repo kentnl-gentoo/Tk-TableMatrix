@@ -2,6 +2,14 @@ Summary of Changes to Tk::TableMatrix
 
 See ChangeLog for detailed changes.
 
+Release 0.8:  10/5/01
+
+* Removed un-needed dependencies on Data::Parse and Date::Format
+  for TableMatrix::Spreadsheet
+  
+* Fixed problem with the selection going nuts when dragging the 
+  selection out of the window.
+
 Release 0.71:  6/15/01
 
 * Fixed to compile with the new Tk800.023 release.

@@ -88,13 +88,9 @@ use Tk;
 use Tk::TableMatrix;
 use Tk::Derived;
 
-# used for parsing date conditions
-use Date::Parse;
-use Date::Format;
-
 use base qw/ Tk::Derived Tk::TableMatrix/;
 
-$VERSION = '0.71';
+$VERSION = '0.8';
 
 
 Tk::Widget->Construct("Spreadsheet");

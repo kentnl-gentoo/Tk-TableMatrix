@@ -1,3 +1,21 @@
+2001-10-04 07:00  cerney
+
+	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
+        pTk/Makefile.PL: Preparation for the next release.
+
+2001-10-02 12:55  cerney
+
+	* TableMatrix.pm: Fixed bug where dragging the cursor outside of
+	the window (when selecting some cells) would cause the selection to
+        go nuts.
+
+2001-07-09 14:59  cerney
+
+	* pTk/mTk/Tktable/tkTable.c: Modified to redraw the entire window
+	when on a expose event. The widget didn't not appear to
+	update/refresh properly when updating what it thought was the
+        invalid rectangle.
+
 2001-06-15 15:19  cerney
 
 	* Changes, Makefile.PL, TableMatrix.pm, TableMatrix/Spreadsheet.pm,

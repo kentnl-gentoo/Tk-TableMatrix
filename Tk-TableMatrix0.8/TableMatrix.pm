@@ -25,7 +25,7 @@ use Carp;
 use strict;
 use vars( '%tkPriv', '$VERSION');
 
-$VERSION = '0.71';
+$VERSION = '0.8';
 
 use Tk qw( Ev );
 
@@ -998,5 +998,25 @@ sub PasteHandler
   }
 }
 
+
+#############################################################
+##  CancelRepeat
+# This procedure is invoked to cancel an auto-repeat action described
+# by $Tk::TableMatrix::tkPriv{afterId}.  It's used by several widgets to auto-scroll
+# the widget when the mouse is dragged out of the widget with a
+# button pressed.
+
+
+sub CancelRepeat{
+	my $w = shift;
+	 
+	my $id = delete $tkPriv{'afterId'}; 
+	$w->afterCancel($id) if($id);
+		 
+}
+
+
+
 1;
+
 __END__

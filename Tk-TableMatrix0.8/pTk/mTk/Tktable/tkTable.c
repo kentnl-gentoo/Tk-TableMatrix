@@ -1354,9 +1354,16 @@ TableEventProc(clientData, eventPtr)
 
     case Expose:
 	if (eventPtr->xexpose.count == 0) {
-	    TableInvalidate(tablePtr, eventPtr->xexpose.x, eventPtr->xexpose.y,
+	
+	    /* The xexpose x/y doesnt appear to redraw the correct area
+	       (verified on the original Tktable 2.6 in tcl as well), so
+	       we redraw the whole table. */
+	       
+	    TableInvalidateAll(tablePtr, INV_HIGHLIGHT);
+
+	    /*TableInvalidate(tablePtr, eventPtr->xexpose.x, eventPtr->xexpose.y,
 		    eventPtr->xexpose.width, eventPtr->xexpose.height,
-		    INV_HIGHLIGHT);
+		    INV_HIGHLIGHT); */
 	}
 	break;
 
