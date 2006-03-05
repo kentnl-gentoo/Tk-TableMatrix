@@ -20,7 +20,7 @@
 #			interactiving resizing
 #--------------------------------------------------------------------------
 ## Interactive cell resizing, affected by -resizeborders option
-##
+##
 package Tk::TableMatrix;
 
 use AutoLoader;
@@ -28,7 +28,7 @@ use Carp;
 use strict;
 use vars( '%tkPriv', '$VERSION');
 
-$VERSION = '1.2';
+$VERSION = '1.21';
 
 use Tk qw( Ev );
 

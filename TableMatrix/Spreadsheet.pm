@@ -33,7 +33,10 @@ B<Bindings Added:>
 =item *
 
 Row/Col resize handles appear when the cursor is placed
-over a row/col border line in the rol/col title area.
+over a row/col border line in the rol/col title area. 
+
+Dragging these handles will resize the row or column. If multiple rows or columns
+are selected, then the new row/col size will apply to all row/cols selected.
 
 =item *
 
@@ -90,7 +93,7 @@ use Tk::Derived;
 
 use base qw/ Tk::Derived Tk::TableMatrix/;
 
-$VERSION = '1.2';
+$VERSION = '1.21';
 
 
 Tk::Widget->Construct("Spreadsheet");
@@ -106,21 +109,7 @@ sub ClassInit{
 
 	# Over-ride default button release binding
 	#  so a cell won't activate by just clicking
-	$mw->bind($class,'<ButtonRelease-1>',
-		sub
-		 {
-		  my $w = shift;
-		  my $Ev = $w->XEvent;
-		  
-		  $w->{rowColResizeDrag} = 0;  # reset row/col resize dragging flag
-		  if ($w->exists)
-		   {
-		    $w->CancelRepeat;
-		    # $w->activate('@' . $Ev->x.",".$Ev->y);
-		   }
-		 }
-	);
-
+	$mw->bind($class,'<ButtonRelease-1>',['Button1Release', $mw]);
 
 	# Edit (activate) a cell if it is double-clicked
 	#   Or F2 is pressed
@@ -419,6 +408,8 @@ sub GeneralMotion{
 				$self->configure(-cursor => 'sb_v_double_arrow',
 					-bordercursor => 'sb_v_double_arrow');
 				$self->{rowColResize} = 1;
+				$self->{rowColResizeRow} = $r;
+				$self->{rowColResizeCol} = undef;
 			}
 			
 		}
@@ -430,6 +421,8 @@ sub GeneralMotion{
 				$self->configure(-cursor => 'sb_h_double_arrow',
 					-bordercursor => 'sb_h_double_arrow');
 				$self->{rowColResize} = 1;
+				$self->{rowColResizeRow} = undef;
+				$self->{rowColResizeCol} = $c;
 			}
 
 		}
@@ -438,7 +431,7 @@ sub GeneralMotion{
 	else{
 		if( $rowColResize && !($self->{rowColResizeDrag}) ){  # Change cursor back if it has been changed, and
 									# we aren't currently doing a row/col resize drag.
-			# print "Setting to $oldCursor\n";
+			#print "Setting to $oldCursor\n";
 			$self->configure(-cursor => $rowColResizeOldCursor,
 				-bordercursor => $rowColResizeOldBDCursor);
 			$self->{rowColResize} = 0;
@@ -449,10 +442,22 @@ sub GeneralMotion{
 		
 }
 
+######################################################################3
+## Over-ridden beginselect. Sets the rowColResizeDrag to indicate
+## that we are doing a row or column resize operation
+sub borderDragto{
+	my $self = shift;
+	my @args = @_;
+	
+	$self->{rowColResizeDrag} = 1;  # Flag = 1 if we are currently doing a row/col resize drag
+	$self->SUPER::borderDragto(@args);
+}
 
+##################################################################
 # Over-ridden Motion routine. Does a row/col resize if
 #   row/col resize cursors are active
-
+#    This is needed for linux for the row resize to work
+#      Not sure why
 sub Motion{
 	my $self  = shift;
 	my $rc = shift;
@@ -468,7 +473,7 @@ sub Motion{
 		$self->SUPER::Motion($rc);
 	}
 }
-		
+			
 #############################################################
 ## Over-ridden beginselect. Doesn't select if we are doing a row/col resize
 sub BeginSelect{
@@ -634,6 +639,102 @@ sub Paste{
 	 eval{ $data = $w->SelectionGet(-selection => $source); }; return if($@);
  	 $w->PasteHandler($cell,$data);
  	 $w->focus if ($w->cget('-state') eq 'normal');
+}
+
+
+#############################################################
+#
+# Sub called when button 1 released. 
+#   Takes care or row/col border drags. 
+#     Also checks to see if more than one row/col is selected during
+#     a row/col resize, so those row/cols will be resized as well
+sub Button1Release{
+    my $w  = shift;
+    my $Ev = $w->XEvent;
+    #print "Button Release 1\n";
+    if ( $w->{rowColResizeDrag} ) {   # Row/Col resize finishing up
+        my @selRowCol = $w->curselection;
+        if ( $w->{rowColResizeRow} ) { # Row risize, check for other rows selected
+            my $row = $w->{rowColResizeRow};
+
+            my $newRowHeight = $w->rowHeight($row);
+            #print "Resized row $row to height" . $newRowHeight . "\n";
+
+           # Find other selected rows (must be contiguous selected from the drag row)
+            my $rowOrg = $w->cget( -roworigin );
+            my $colOrg = $w->cget( -colorigin );
+            my $rowMax = $rowOrg + $w->cget( -rows ) - 1;    # max row in table
+            my $firstDataRow =
+              $rowOrg + $w->cget( -titlerows );              # first Data Row
+            my $firstDataCol =
+              $colOrg + $w->cget( -titlecols );              # first Data Col
+            my @otherRowsSelected;
+            foreach my $row ( ( $row + 1 ) .. $rowMax ) {    # Increasing rows
+                #print "Checking for inclusion of $row,$firstDataCol\n";
+                last unless ( $w->selectionIncludes("$row,$firstDataCol") );
+                push @otherRowsSelected, $row;
+            }
+            foreach my $row ( reverse( $firstDataRow .. ( $row - 1 ) ) )
+            {                                                # Decreasing rows
+                #print "Checking for inclusion of $row,$firstDataCol\n";
+                last unless ( $w->selectionIncludes("$row,$firstDataCol") );
+                push @otherRowsSelected, $row;
+            }
+
+            # Set New row height for other rows
+            if (@otherRowsSelected) {
+
+                #  Set args to row => height, row => height ...
+                my @rowHeightArgs =
+                  map { $_ => $newRowHeight } @otherRowsSelected;
+                $w->rowHeight(@rowHeightArgs);
+            }
+        }
+        elsif ( $w->{rowColResizeCol} ) { # Col risize, check for other Cols selected
+            my $col = $w->{rowColResizeCol};
+
+            my $newColWidth = $w->colWidth($col);
+            #print "Resized col $col to width" . $newColWidth . "\n";
+
+           # Find other selected cols (must be contiguous selected from the drag col)
+            my $rowOrg = $w->cget( -roworigin );
+            my $colOrg = $w->cget( -colorigin );
+            my $colMax = $colOrg + $w->cget( -cols ) - 1;    # max col in table
+            my $firstDataRow =
+              $rowOrg + $w->cget( -titlerows );              # first Data Row
+            my $firstDataCol =
+              $colOrg + $w->cget( -titlecols );              # first Data Col
+            my @otherColsSelected;
+            foreach my $col ( ( $col + 1 ) .. $colMax ) {    # Increasing cols
+                #print "Checking for inclusion of $firstDataRow,$col\n";
+                last unless ( $w->selectionIncludes("$firstDataRow,$col") );
+                push @otherColsSelected, $col;
+            }
+            foreach my $col ( reverse( $firstDataCol .. ( $col - 1 ) ) )
+            {                                                # Decreasing rows
+                #print "Checking for inclusion of $row,$firstDataCol\n";
+                last unless ( $w->selectionIncludes("$firstDataRow,$col") );
+                push @otherColsSelected, $col;
+            }
+
+            # Set Col width height for other rows
+            if (@otherColsSelected) {
+
+                #  Set args to row => height, row => height ...
+                my @colWidthArgs =
+                  map { $_ => $newColWidth } @otherColsSelected;
+                $w->colWidth(@colWidthArgs);
+            }
+        }
+    }
+
+    $w->{rowColResizeDrag} = 0;        # reset row/col resize dragging flag
+    $w->{rowColResizeRow}  = undef;    # reset row resize flag
+    $w->{rowColResizeCol}  = undef;    # reset col resize flag
+    if ( $w->exists ) {
+        $w->CancelRepeat;
+
+    }
 }
 
 

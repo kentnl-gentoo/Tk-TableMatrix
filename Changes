@@ -2,6 +2,12 @@ Summary of Changes to Tk::TableMatrix
 
 See ChangeLog for detailed changes.
 
+Release 1.21   3/2/06
+
+* Updated to make the row/size resize operation (that happens when you
+  drag the row/col borders) apply to every row or column that is currently
+  selected, instead of just the	row/col border that was dragged.
+  
 Release 1.2   1/26/05
 
 * Fixed bug which was causing crashes on perl 5.8.4 on win32 when 
