@@ -2,6 +2,10 @@ Summary of Changes to Tk::TableMatrix
 
 See ChangeLog for detailed changes.
 
+Release 1.22   3/23/06
+
+* Misc Bugs fixed in Tk::TableMatrix::SpreadsheetHideRows
+ 
 Release 1.21   3/2/06
 
 * Updated to make the row/size resize operation (that happens when you

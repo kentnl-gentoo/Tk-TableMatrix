@@ -4,6 +4,10 @@
 # This example displays made-up average temperature data
 #  for different time periods (quarter and months), and regions.
 
+# Updated to have more spans. 3/8/06. Fully expanding Row 2 and the
+#    lower level Rows should look ok, with the spans restoring back
+#    to where they were.
+
 use Tk;
 
 use Tk::TableMatrix::SpreadsheetHideRows;
@@ -64,6 +68,7 @@ my $expandData = {
 	        	 [ '','','Jun', 'South','--',68],
 	        	 ],
 	       tag => 'detail',
+	       spans => [ 1 => '0,1'],
 	       expandData => {
 	       			2 => { data => [ [ '','','', '','Texas',58],
 				        	  [ '','','', '','Ok',65],

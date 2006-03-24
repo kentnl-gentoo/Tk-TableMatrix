@@ -124,7 +124,7 @@ use Tk::Derived;
 
 use base qw/ Tk::Derived Tk::TableMatrix::Spreadsheet/;
 
-$VERSION = '1.21';
+$VERSION = '1.22';
 
 
 Tk::Widget->Construct("SpreadsheetHideRows");
@@ -152,8 +152,8 @@ sub Populate {
     
     $self->SUPER::Populate($args);
     
-    $self->tagConfigure('plus', -image =>  $self->Getimage("plus"), -showtext => 0);
-    $self->tagConfigure('minus', -image =>  $self->Getimage("minus"), -showtext => 0);
+    $self->tagConfigure('plus', -image =>  $self->Getimage("plus"), -showtext => 0, -anchor => 'center');
+    $self->tagConfigure('minus', -image =>  $self->Getimage("minus"), -showtext => 0,  -anchor => 'center');
     
     $self->{normalCursor} = $self->cget('-cursor'); # get the default cursor
  
@@ -196,10 +196,13 @@ sub showDetail{
 	my $noRows = scalar( @$detailArray);
 	
 	# InsertRows:
+	#    change state to normal if not already so we can insert
+	my $currentState = $self->cget(-state); 
+	$self->configure(-state => 'normal') unless( $currentState eq 'normal');
 	$self->insertRows($row,$noRows);
 	
 	# Adjust Spans:
-	$self->adjustSpans($row,$noRows);
+	$self->adjustSpans($row+1,$noRows);
 	
 	#insert data
 	my $colorigin =  $self->cget(-colorigin);
@@ -304,6 +307,8 @@ sub showDetail{
 
 	}
 
+	# Put the state back
+	$self->configure(-state => $currentState) unless( $currentState eq 'normal');
 	
 	
 }
@@ -393,6 +398,10 @@ sub hideDetail{
 	}
 
 
+	#    change state to normal if not already so we can modify the table
+	my $currentState = $self->cget(-state); 
+	$self->configure(-state => 'normal') unless( $currentState eq 'normal');
+
 	# Move Any existing spans that are at rows > $row+$noRows to where the should be, now that rows
 	#  have been deleted
 	$self->adjustSpans($row+$noRows,-$noRows);
@@ -433,6 +442,11 @@ sub hideDetail{
 	# Copy new to existing:
 	%$expandData = %expandDataNew;
 		
+
+	# Put the state back
+	$self->configure(-state => $currentState) unless( $currentState eq 'normal');
+
+
 	return $noRows;
 
 
