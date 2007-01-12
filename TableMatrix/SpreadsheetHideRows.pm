@@ -124,7 +124,7 @@ use Tk::Derived;
 
 use base qw/ Tk::Derived Tk::TableMatrix::Spreadsheet/;
 
-$VERSION = '1.22';
+$VERSION = '1.23';
 
 
 Tk::Widget->Construct("SpreadsheetHideRows");

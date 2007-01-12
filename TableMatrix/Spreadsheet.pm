@@ -15,7 +15,6 @@ Tk::TableMatrix::Spreadsheet - Table Display with Spreadsheet-like bindings.
 			      -titlerows => 1, -titlecols => 1,
 			      -variable => $arrayVar,
 			      -selectmode => 'extended',
-			      -resizeborders => 'both',
 			      -titlerows => 1,
 			      -titlecols => 1,
 			      -bg => 'white',
@@ -37,6 +36,11 @@ over a row/col border line in the rol/col title area.
 
 Dragging these handles will resize the row or column. If multiple rows or columns
 are selected, then the new row/col size will apply to all row/cols selected.
+
+Note: With the base Tk::TableMatrix, it is possible to resize the row/cols by dragging
+on any cell border. To be more spreadsheet-like, Tk::TableMatrix::Spreadsheet  defaults to enable row/col
+resizing only thru the title row/col dragging. To override this default behavoir, set the -resizeborder option to
+'both' at startup.
 
 =item *
 
@@ -93,7 +97,7 @@ use Tk::Derived;
 
 use base qw/ Tk::Derived Tk::TableMatrix/;
 
-$VERSION = '1.22';
+$VERSION = '1.23';
 
 
 Tk::Widget->Construct("Spreadsheet");
@@ -134,7 +138,7 @@ sub ClassInit{
 		   {
 		    $w->CancelRepeat;
 		    my $location = '@' . $Ev->x.",".$Ev->y;
-		    print "location = $location\n";
+		    #print "location = $location\n";
 		    if( $w->selectionIncludes($location)){
 		    	$w->activate('@' . $Ev->x.",".$Ev->y);
 		    }
@@ -222,6 +226,9 @@ sub Populate {
     $args->{-bg} = 'white' unless defined( $args->{-bg});
     
     $args->{-colstretchmode} = 'unset' unless defined( $args->{-colstretchmode});
+
+    # Default behavior is to not allow cell resizing, just at the row/col titles (like Excel)
+    $args->{-resizeborders}  = 'none' unless defined( $args->{-resizeborders});
     
     
     $cw->SUPER::Populate($args);
@@ -449,6 +456,11 @@ sub borderDragto{
 	my $self = shift;
 	my @args = @_;
 	
+       if( !$self->{rowColResizeDrag}){
+	       #print "StartDrag\n";
+	       $self->{oldResizeBorders} = $self->cget(-resizeborders); # save the value of resizeborders so we can restore it later
+	       $self->configure(-resizeborders => 'both');
+       }
 	$self->{rowColResizeDrag} = 1;  # Flag = 1 if we are currently doing a row/col resize drag
 	$self->SUPER::borderDragto(@args);
 }
@@ -465,8 +477,13 @@ sub Motion{
 	if( $self->{rowColResize}){ # Do a row/col resize if cursors active
 		my $Ev = $self->XEvent;
 		
+		if( !$self->{rowColResizeDrag}){   # Same as the borderDragTo, somethings this gets called first
+			#print "StartDrag\n";
+	       		$self->{oldResizeBorders} = $self->cget(-resizeborders); # save the value of resizeborders so we can restore it later
+	      	 	$self->configure(-resizeborders => 'both');
+		}
 		$self->{rowColResizeDrag} = 1;  # Flag = 1 if we are currently doing a row/col resize drag
-		$self->border('dragto',$Ev->x,$Ev->y);
+		$self->SUPER::borderDragto($Ev->x,$Ev->y);
 	}
 	else{
 		
@@ -728,6 +745,17 @@ sub Button1Release{
         }
     }
 
+    if($w->{rowColResizeDrag}){
+    
+        # restore the value of resize borders to what is was before
+	if( my $oldResizeborders = $w->{oldResizeBorders}){
+    		$w->configure(-resizeborders => $oldResizeborders);
+		delete $w->{oldResizeBorders};
+	}
+    
+    	#print "Drag Finished\n";
+    }
+    
     $w->{rowColResizeDrag} = 0;        # reset row/col resize dragging flag
     $w->{rowColResizeRow}  = undef;    # reset row resize flag
     $w->{rowColResizeCol}  = undef;    # reset col resize flag

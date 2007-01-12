@@ -2,6 +2,11 @@ Summary of Changes to Tk::TableMatrix
 
 See ChangeLog for detailed changes.
 
+Release 1.23   1/9/2007
+
+* Changed TableMatrix::Spreadsheet row/col resize behavior to be more
+spreadsheet-like.
+ 
 Release 1.22   3/23/06
 
 * Misc Bugs fixed in Tk::TableMatrix::SpreadsheetHideRows

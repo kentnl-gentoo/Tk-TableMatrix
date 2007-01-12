@@ -22,7 +22,6 @@ my $t = $top->Scrolled('Spreadsheet', -rows => 21, -cols => 11,
 			      -titlerows => 1, -titlecols => 1,
 			      -variable => $arrayVar,
 			      -selectmode => 'extended',
-			      -resizeborders => 'both',
 			      -titlerows => 1,
 			      -titlecols => 1,
 			     #  -state => 'disabled'

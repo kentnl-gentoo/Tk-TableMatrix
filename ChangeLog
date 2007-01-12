@@ -1,3 +1,33 @@
+2007-01-11 20:26  tag TableMatrix_1_23
+
+2007-01-11 20:26  A0182636
+
+	* Makefile.PL, pTk/Makefile.PL: Preparation for next release.
+
+2007-01-09 14:00  cerney
+
+	* Changes, TableMatrix.pm, TableMatrix/Spreadsheet.pm,
+	TableMatrix/SpreadsheetHideRows.pm: Preparation for next release
+
+2007-01-09 13:51  cerney
+
+	* demos/TableMatrixSpreadsheetTest: Updated to be consistent with
+	latest changes in the resizeborders behavoir
+
+2007-01-09 13:50  cerney
+
+	* TableMatrix/Spreadsheet.pm: Removed extra code that would print
+	"location" when F2 was pressed. (This was debugging code that
+	should have been removed earlier)
+
+2007-01-09 13:46  cerney
+
+	* TableMatrix/Spreadsheet.pm: Corrected behavoir that wasn't very
+	spreadsheet-like. Now you can only resize row/cols thru the title
+	row/cols. The previous behavoir created problems, because when a
+	user would drag to selected several cells, sometimes the row or col
+	would resize as well.
+
 2006-03-24 13:12  tag TableMatrix_1_22
 
 2006-03-24 13:12  cerney
